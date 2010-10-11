@@ -1,0 +1,58 @@
+
+
+v1.0.0.5
+-----------------------
+
+
+v1.0.0.8
+-----------------------
+  - fixing bwvt quantisation
+
+
+v1.0.0.9
+-----------------------
+  - putting as much as possible in A1, then deleting the sweeps subdirectory
+
+
+v1.0.0.10
+-----------------------
+  - plotting ISIs not ACGs
+
+
+v1.0.0.11
+-----------------------
+  - pentatrode version
+
+
+v1.0.0.12
+-----------------------
+  - debugging with tom
+
+
+v1.0.0.13
+-----------------------
+  - allowing trigger as a clustering parameter
+
+
+v1.0.0.14
+-----------------------
+  - not using trigger
+
+
+v1.0.0.15
+-----------------------
+  - adding history recreate
+
+
+v1.0.0.16
+-----------------------
+  - candidate events and shapes now saved separately
+
+
+v1.0.0.17
+-----------------------
+  - contrast analysis v6
+
+
+v1.0.0.19
+-----------------------

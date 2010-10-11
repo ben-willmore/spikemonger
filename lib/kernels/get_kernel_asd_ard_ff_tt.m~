@@ -1,0 +1,209 @@
+function results = get_kernel_asd_ard_ff_tt(grid, Y, params)
+
+  
+%% initialise
+% =============
+
+  freqs = standard_freqs;
+  n.ff  = L(freqs);
+  n.tt  = 10;
+  stage = struct;
+
+
+%% get X
+% =============
+  X = grid';
+
+  XL = zeros( size(X,1), n.ff, n.tt );
+    for ii = 1:n.tt
+      lag = ii-1;
+      XL( ii:end, :, ii) = X( 1:(end-lag), :);
+    end
+  X = XL;
+
+  % add constant term
+    X(:,n.ff+1,n.tt+1) = 1;
+
+  % permute
+    XP.f = permute(X,[1 2 3]);
+    XP.t = permute(X,[1 3 2]);
+
+
+%% initialise weights
+% ======================
+
+  w = struct;
+  w.t = ones(size(X,3),1);
+  w.f = ones(size(X,2),1);
+  
+
+
+%% solve ML, via iterations
+% =============================
+
+  fprintf('solving ML...');
+
+  for ii=1:30
+    A.t = ( t3_v(XP.t,w.f) );
+    w.t = inv( A.t' * A.t) * A.t' * Y';
+    A.f = ( t3_v(XP.f,w.t) );
+    w.f = inv( A.f' * A.f ) * A.f' * Y';
+  end
+  
+  w.ff_by_tt = w.f(1:(end-1)) * w.t(1:(end-1))';
+  
+  stage(1).description = 'ML';
+  stage(1).w = w;
+  stage(1).logE = log(0.5*( (Y-w.f'*A.f') * (Y-w.f'*A.f')' ));
+  
+  fprintf(' [done]\n');
+
+
+
+%% run ASD
+% =========
+
+  rho.t = 0;
+  rho.f = 0;
+  d.t = 1;
+  d.f = 1;
+  asdcov = struct;
+
+  fprintf('solving ASD');
+
+  for ii=1:3
+    
+    fprintf('.');
+    
+    A.t = t3_v(XP.t, w.f);
+    asdcov(ii).t = get_asd_covariance_matrix(A.t',Y,w.t,rho.t,d.t);
+      C.t = asdcov(ii).t.C;
+      D.t = asdcov(ii).t.invC;
+      rho.t = asdcov(ii).t.rho;
+      d.t = asdcov(ii).t.di;
+    w.t = inv( A.t'*A.t + D.t ) * A.t' * Y';
+
+    A.f = t3_v(XP.f, w.t);
+    asdcov(ii).f = get_asd_covariance_matrix(A.f',Y,w.f,rho.f,d.f);
+      C.f = asdcov(ii).f.C;
+      D.f = asdcov(ii).f.invC;
+      rho.f = asdcov(ii).f.rho;
+      d.f = asdcov(ii).f.di;
+    w.f = inv( A.f'*A.f + D.f ) * A.f' * Y';
+
+  end
+  
+  w.ff_by_tt = w.f(1:(end-1)) * w.t(1:(end-1))';
+  
+  stage(2).description = 'ASD';
+  stage(2).w = w;
+  stage(2).logE = log(0.5*( (Y-w.f'*A.f') * (Y-w.f'*A.f')' ));
+  stage(2).params.C = C;
+  stage(2).params.invC = D;
+  stage(2).params.rho = rho;
+  stage(2).params.d = d;
+
+  fprintf(' [done]\n');
+  
+
+%% regularised ML, given cov matrices
+% ====================================
+
+  fprintf('solving ASD-regularised ML...');
+
+  for ii=1:30
+    A.t = ( t3_v(XP.t,w.f) );
+    w.t = inv( A' * A + D.t ) * A' * Y';
+    A.f = ( t3_v(XP.f,w.t) );
+    w.f = inv( A.f' * A.f + D.f ) * A.f' * Y';
+
+  end
+
+  w.ff_by_tt = w.f(1:(end-1)) * w.t(1:(end-1))';
+  
+  stage(3).description = 'ASD-regularised ML';
+  stage(3).w = w;
+  stage(3).logE = log(0.5*( (Y-w.f'*A.f') * (Y-w.f'*A.f')' ));
+  
+  fprintf(' [done]\n');
+  
+  
+  
+
+%% run ARD in ASD basis
+% ========================
+
+  fprintf('solving ASD-regularised ARD');
+  
+  alpha.t = ones(n.tt+1,1);
+  alpha.f = ones(n.ff+1,1);
+  
+  [EV.t ED.t] = eig(C.t);
+  [EV.f ED.f] = eig(C.f);
+  
+  R.t = EV.t * sqrt(ED.t);
+  R.f = EV.f * sqrt(ED.f);
+  
+  for ii=1:3
+    fprintf('.');
+    A.t  = t3_v(XP.t, w.f);
+    A2.t = A.t * R.t';
+    ardasdcov(ii).t = get_ard_covariance_matrix( A2.t', Y, inv(R.t)'*w.t, alpha.t);
+    C.t = ardasdcov(ii).t.C;
+    D.t = ardasdcov(ii).t.invC;
+    w.t = R.t' * inv( A2.t'*A2.t + D.t ) * A2.t' * Y';
+
+    A.f  = t3_v(XP.f, w.t);
+    A2.f = A.f * R.f';
+    ardasdcov(ii).f = get_ard_covariance_matrix( A2.f', Y, inv(R.f)'*w.f, alpha.f);
+    C.f = ardasdcov(ii).f.C;
+    D.f = ardasdcov(ii).f.invC;
+    w.f = R.f' * inv( A2.f'*A2.f + D.f ) * A2.f' * Y';
+
+  end  
+  
+  w.ff_by_tt = w.f(1:(end-1)) * w.t(1:(end-1))';
+  
+  stage(4).description = 'ASD-regularised ARD';
+  stage(4).w = w;
+  stage(4).logE = log(0.5*( (Y-w.f'*A.f') * (Y-w.f'*A.f')' ));
+  stage(4).params.C = C;
+  stage(4).params.invC = D;
+  stage(4).params.alpha.t = diag(C.t);
+  stage(4).params.alpha.f = diag(C.f); 
+  
+  fprintf(' [done]\n');  
+    
+  
+%% regularised ML, given cov matrices
+% ====================================
+
+  fprintf('solving ASD-ARD-regularised ML...');
+
+  for ii=1:30
+    A.t  = ( t3_v(XP.t,w.f) );
+    A2.t = A.t * R.t';    
+    w.t  = R.t' * inv( A2.t'*A2.t + D.t ) * A2.t' * Y';
+    
+    A.f  = ( t3_v(XP.f,w.t) );
+    A2.f = A.f * R.f';
+    w.f  = R.f' * inv( A2.f'*A2.f + D.f ) * A2.f' * Y';
+  end
+
+  w.ff_by_tt = w.f(1:(end-1)) * w.t(1:(end-1))';
+  
+  stage(5).description = 'ASD-ARD-regularised ML';
+  stage(5).w = w;
+  stage(5).logE = log(0.5*( (Y-w.f'*A.f') * (Y-w.f'*A.f')' ));
+  stage(5).params = stage(4).params;
+  
+  fprintf(' [done]\n');  
+  
+%% parse results
+% ================
+
+  results = struct;
+    results.w = w;
+    results.covariance.C    = C;
+    results.covariance.invC = D;
+    results.stage           = stage;

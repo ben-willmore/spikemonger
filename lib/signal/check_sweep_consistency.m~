@@ -1,0 +1,67 @@
+function check_sweep_consistency(dirs,swl)
+  % check_sweep_consistency(dirs)
+  % check_sweep_consistency(dirs,swl)
+
+  
+fprintf_subtitle('checking consistency of sweeps across channels');
+
+% get the list of sweeps
+% ------------------------
+
+if nargin<2
+  fprintf_bullet('compiling sweep list...',1);
+  swl = get_sweep_list(dirs);
+  fprintf('[ok]\n');
+end
+
+% same number of channels per sweep
+% -----------------------------------
+
+% how many in each
+fprintf_bullet('checking number of channels per sweep...');
+n.sweeps = L(swl);
+n.sweep_params = nan(1,L(swl));
+for ii=1:n.sweeps
+  swpf = swl(ii).by_type.sweep_params;
+  n.sweep_param_files(ii) = L(setdiff({swpf.name},'sweep_params.mat'));
+end
+
+% are they all the same
+if ~(L(unique(n.sweep_param_files))==1)  
+  warning('bwvt:error','different number of channels per sweep');
+  keyboard;
+  error('bwvt:error','different number of channels per sweep');
+end
+fprintf('[ok]\n');
+
+
+% same parameters for each sweep
+% ----------------------------------
+
+p = 0;
+fprintf_bullet('checking sweep parameters');
+for ii=1:L(swl)
+  p = print_progress(ii,L(swl),p);
+  swpf = swl(ii).by_type.sweep_params;
+  swp = cell(1,L(swpf));
+  for jj=1:L(swpf)
+    swp{jj} = get_sweep_file(swpf(jj));
+  end
+
+  % check that the sweep parameter names are consistent
+  try
+    swp = cell2mat(swp);
+  catch
+    error('bwvt:error','different sweep parameter names across channels');
+  end
+
+  % check that the sweep parameter values are consistent
+  if size(unique(reach(swp,'all.values')','rows')',2)~=1
+    error('bwvt:error','different sweep parameter values across channels');
+  end
+  
+  % save it
+  save_sweep_file(dirs, swpf(1).timestamp, swp(1), 'sweep_params');
+  
+end
+fprintf('[ok]\n');
