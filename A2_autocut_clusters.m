@@ -127,5 +127,27 @@ end
 %% assign to clusters
 % ======================
 
+n.c = clusters.n_clusters;
+n.u = size(fsp,1);
 
+P = nan(n.c, n.u);
+
+for ii=2:n.c
+  w = clusters.W(ii);
+  m = clusters.M(:,ii);
+  v = clusters.V(:,:,ii);
+%   vinv = inv(v);
+  X = fsp - repmat(m', n.u, 1);
+  
+  
+  a = log(w) - 0.5*logdet(v) - 0.5*log(2*pi);
+  %a = 0;
+  
+  P(ii,:) = a - 0.5*sum(X'.*(v\X'));
+  
+%   for jj=1:n.u
+%     x = X(jj,:);
+%     P(ii,jj) = a - 0.5 * x*vinv*x';
+%   end
+end
 
