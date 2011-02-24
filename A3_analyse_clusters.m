@@ -6,8 +6,13 @@ function A3_analyse_clusters(dirs, cluster_type, varargin)
 % ==================
 
 % default cluster
-if nargin==1
-  cluster_type = 'clusters_pentatrodes';
+default_cluster_type = 'clusters_pentatrodes';
+try
+  if nargin==1
+    cluster_type = default_cluster_type;
+  end
+catch
+  cluster_type = default_cluster_type;
 end
 
 % params
@@ -58,45 +63,6 @@ fprintf_timediff(t1);
 
 %% are we in a memory workaround
 % ================================
-
-if does_log_exist(dirs,'A1.candidate.events.memory.workaround.2')
-  
-  % announce
-  t1 = clock;
-  fprintf_bullet('pulling out some example shapes');
-  memory_workaround = true;
-  
-  % get the parameters  
-  wk = get_event_file(dirs,'which_kept');
-  s = get_event_file(dirs,'CEs_MW_shape_size');
-  n.ch = s(3);
-  n.sh_per_c = 1000;
-  n.sh_total = n.sh_per_c * n.c;
-  
-  % which examples to use
-  eg_idxs = cell(n.c,1);
-  for cc=1:n.c
-    eg_idxs{cc} = find(c.C==cc);
-    eg_idxs{cc} = eg_idxs{cc}( head(randperm(L(eg_idxs{cc})), min(L(eg_idxs{cc}),n.sh_per_c) ) );
-  end
-  n.eg_shapes = sum(Lincell(eg_idxs));
-  
-  % pick out these examples
-  sh = nan(n.eg_shapes,s(2),s(3));
-  for ch=1:s(3)
-    fprintf('.');
-    sht = get_event_file(dirs,['CEs_MW_sh' n2s(ch,2)]);
-    sht = sht(wk,:);
-    sht = sht(cell2mat(eg_idxs),:);
-    sh(:,:,ch) = sht;
-  end
-  fprintf_timediff(t1);
-  
-
-  
-else
-  
-  memory_workaround = false;
   
   % get the parameters
   s = size(CEs.shape);
@@ -115,7 +81,7 @@ else
   % pick out examples
   sh = CEs.shape(cell2mat(eg_idxs),:,:);
 
-end
+
 
 
 

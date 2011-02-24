@@ -1024,7 +1024,7 @@ int main(int argc, char **argv) {
 	  SaveOutput(K1.BestClass);
 	}
 	//NCR saveparams
-	//SaveParams(K1);
+	SaveParams(K1);
       }
       Output("\n");
     }

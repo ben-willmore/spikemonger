@@ -103,6 +103,7 @@ if subset_size==1
     end
     
   catch
+    keyboard;
     W = []; M = []; V = [];
   end
   
