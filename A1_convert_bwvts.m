@@ -53,8 +53,6 @@ if does_log_exist(dirs,'A1.finished')
 end
 
 
-
-
 %% convert the bwvts
 % =====================
 
@@ -101,6 +99,7 @@ end
 if BWVTS_ONLY
   return;
 end
+
 
 %% aggregate metadata
 % =====================
