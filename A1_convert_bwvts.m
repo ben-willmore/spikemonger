@@ -117,7 +117,7 @@ if does_log_exist(dirs,'A1.swl.generated');
   swl = get_event_file(dirs,'sweep_list');
   sweep_params = get_event_file(dirs,'sweep_params');
   
-  % if not, create it
+% if not, create it
 else
   swl = get_sweep_list(dirs);
   [sweep_params swl] = check_sweep_consistency(dirs,swl);
@@ -125,8 +125,6 @@ else
   create_log(dirs,'A1.swl.generated');
 end
 fprintf('[ok]\n');
-
-% check their consistency, and aggregate the sweep parameters
 
 
 
@@ -149,7 +147,7 @@ else
     end
     
     
-    % if no parallel computation available
+  % if no parallel computation available
   else
     fprintf_bullet('searching through sweeps (non-parallel)');
     % run through each sweep
@@ -174,6 +172,7 @@ else
   fprintf_timediff(t1);
 end
 
+
 %% compile candidate event database
 % ====================================
 
@@ -184,6 +183,7 @@ dirs = fix_dirs_struct(dirs);
 
 if ~does_log_exist(dirs,'A1.candidate.events.pentatrodes.compiled')
   
+  % compile event database
   CEs = compile_candidate_event_database_for_large_data(dirs,swl);
   
   % calculate feature space representation
@@ -196,12 +196,14 @@ if ~does_log_exist(dirs,'A1.candidate.events.pentatrodes.compiled')
   params.include_trigger = true;
   params.include_trigger = false;
   params.use_pentatrodes = true;
+
+  [fsp params] = design_feature_space(CEs, params);
   
   % feature space - pentatrodes
   if ~does_log_exist(dirs,'A1.fsp.generated')
-    [fsp which_kept params] = project_events_into_feature_space(CEs,params,dirs);
-    save_event_file(dirs,fsp,'feature_space_pentatrodes');
-    save_event_file(dirs,which_kept,'which_kept');
+    [fsp which_kept params] = project_events_into_feature_space(CEs,params);
+    save_event_file(dirs, fsp, 'feature_space_pentatrodes');
+    save_event_file(dirs, p.which_kept, 'which_kept');
     create_log(dirs,'A1.fsp.generated');
   else
     which_kept = get_event_file(dirs,'which_kept');

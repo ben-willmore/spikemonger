@@ -1,10 +1,9 @@
-function [fsp p] = project_events_into_feature_space(CEs, params)
+function [fsp p] = design_feature_space(CEs, params)
+  % [fsp params] = design_feature_space(CEs, params)
   
-
 %% PCA parameters
 % =================
 
-% default parameters
 def.number_pc_per_channel = 2;
 def.alignment_samples = 14 + (-5:5);
 def.max_alignment_shift = 5;
@@ -13,31 +12,21 @@ def.trigger_refractory_samples = 3;
 def.include_absolute_time = false;
 def.include_trigger = false;
 def.use_pentatrodes = false;
-% these must be there
-def.mean_event = [];
-def.which_kept = [];
-def.v = [];
 
 % parse params
-if nargin==1, params = struct; end
+try
+  if nargin==1, params = struct; end
+catch
+end
 fd = fieldnames(def);
 fp = fieldnames(params);
 
-% error if there are bad fields
+% are there any bad params
 if ~isempty(setdiff(fp,fd))
   error('input:error',['unknown param field: ' pick(setdiff(fp,fd),1,'c')]);
 end
 
-% error if required fields are missing
-if ~ismember('which_kept',fp) 
-  error('input:error','missing param field: which_kept');
-elseif ~ismember('mean_event',fp)
-  error('input:error','missing param field: mean_event');
-  elseif ~ismember('v',fp)
-  error('input:error','missing param field: v (eigenvectors)');
-end
-
-% used parameters
+% make the param structure
 p = def;
 for ii=1:L(fp)
   p.(fp{ii}) = params.(fp{ii});
@@ -69,13 +58,18 @@ if p.use_pentatrodes
   end
 end
 
+
 %% time shift
 % ==============
 
-% check that the mean vector is the right length
-if ~( numel(CEs.shape(1,:,:)) == L(p.mean_event) )
-  error('input:error', 'mean event has the wrong number of elements');
-end
+% concatenate each individual event (across channels) into a single event
+% vector. only keep the alignment samples.
+sht = CEs.shape;
+sht(:,setdiff(1:n.smp,p.alignment_samples),:) = 0;
+
+% find the mean event vector
+p.mean_event = mean(reshape(sht,s(1),s(2)*s(3)));
+clear sht;
 
 % for each event, calculate the best time shift for maximum alignment with
 % the mean event vector.
@@ -94,8 +88,7 @@ timeshift = maxpos - (p.max_alignment_shift+1);
 timeshift(abs(timeshift)==p.max_alignment_shift)=0;
 
 
-%% apply timeshift and trim
-
+% apply timeshift and trim
 ti = p.pca_samples(1) + timeshift - 1;
 tf = ti + L(p.pca_samples) - 1;
 sht = nan(n.events, L(p.pca_samples + p.max_alignment_shift), n.ch, 'single');
@@ -104,8 +97,8 @@ for ii=1:n.events
 end
 
 
-%% project into fsp
-% ====================
+%% perform PCA
+% ==============
 
 % how many PCs we get in the end
 s = size(sht);
@@ -113,14 +106,34 @@ n.ch = s(3);
 n.pc = p.number_pc_per_channel;
 n.total = n.ch * n.pc;
 
+% container for eigenvectors
+v = cell(1,n.ch);
+
 % fsp = events in PC space
 fsp = nan(n.events,n.total);
 for ii=1:n.ch
-  jj = (ii-1)*n.pc + (1:n.pc);  
+  jj = (ii-1)*n.pc + (1:n.pc);
+  % just data in this channel
   shtt = sq(sht(:,:,ii));
-  fsp(:,jj) = shtt * p.v{ii};
+  % perform PCA
+  c = cov(shtt);
+  try
+    [vt d] = eig(c);
+  catch
+    vt = randn(s(2));
+    dt = randn(s(2));
+  end
+  % put in correct order
+  %d = fliplr(diag(d)');
+  vt = fliplr(vt);
+  % save eigenvector
+  v{ii} = vt(:,1:n.pc);
+  % project into feature space
+  fsp(:,jj) = shtt * v{ii};
 end
 
+% save eigenvectors
+p.v = v;
 
 %% include trigger and absolute time, if requested
 % ==================================================
@@ -133,8 +146,8 @@ if p.include_absolute_time
   fsp = [fsp CEs.time_absolute_s];
 end
 
-%% put into struct, if not pentatrodes
-% ======================================
+%% find unique events, if not pentatrodes
+% =========================================
 
 if ~p.use_pentatrodes
 
@@ -165,7 +178,7 @@ if ~p.use_pentatrodes
 end
 
 
-%% put into struct, if pentatrodes
+%% find unique events, if pentatrodes
 % ======================================
 
 if p.use_pentatrodes

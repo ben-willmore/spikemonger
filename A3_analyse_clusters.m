@@ -32,7 +32,7 @@ if does_log_exist(dirs,['A3.' cluster_type '.statistics.calculated']);
   return;
 end
 
-% load
+%% load
 fprintf_bullet('loading cluster data...');
 swl = get_event_file(dirs,'sweep_list');
 ts = get_timestamps_from_swl(swl);
@@ -61,25 +61,25 @@ mkdir_nowarning(dirs.cluster);
 fprintf_timediff(t1);
 
 
-%% are we in a memory workaround
-% ================================
-  
-  % get the parameters
-  s = size(CEs.shape);
-  n.ch = s(3);
-  n.sh_per_c = 1000;
-  n.sh_total = n.sh_per_c * n.c;
+%% shape examples
+% =================
 
-  % which examples to use
-  eg_idxs = cell(n.c,1);
-  for cc=1:n.c
-    eg_idxs{cc} = find(c.C==cc);
-    eg_idxs{cc} = eg_idxs{cc}( head(randperm(L(eg_idxs{cc})), min(L(eg_idxs{cc}),n.sh_per_c) ) );
-  end
-  n.eg_shapes = sum(Lincell(eg_idxs));
+% get the parameters
+s = size(CEs.shape);
+n.ch = s(3);
+n.sh_per_c = 1000;
+n.sh_total = n.sh_per_c * n.c;
 
-  % pick out examples
-  sh = CEs.shape(cell2mat(eg_idxs),:,:);
+% which examples to use
+eg_idxs = cell(n.c,1);
+for cc=1:n.c
+  eg_idxs{cc} = find(c.C==cc);
+  eg_idxs{cc} = eg_idxs{cc}( head(randperm(L(eg_idxs{cc})), min(L(eg_idxs{cc}),n.sh_per_c) ) );
+end
+n.eg_shapes = sum(Lincell(eg_idxs));
+
+% pick out examples
+sh = CEs.shape(cell2mat(eg_idxs),:,:);
 
 
 
