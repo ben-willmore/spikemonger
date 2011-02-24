@@ -186,7 +186,10 @@ if ~does_log_exist(dirs,'A1.candidate.events.pentatrodes.compiled')
   % compile event database
   CEs = compile_candidate_event_database_for_large_data(dirs,swl);
   
-  % calculate feature space representation
+  % calculate feature space representation for clustering dataset
+  % ---------------------------------------------------------------
+  
+  % parameters
   params = struct;
   params.number_pc_per_channel = 3;
   params.max_alignment_shift = 2;
@@ -196,40 +199,54 @@ if ~does_log_exist(dirs,'A1.candidate.events.pentatrodes.compiled')
   params.include_trigger = true;
   params.include_trigger = false;
   params.use_pentatrodes = true;
-
-  [fsp params] = design_feature_space(CEs, params);
   
-  % feature space - pentatrodes
+  % design feature space
   if ~does_log_exist(dirs,'A1.fsp.generated')
-    [fsp which_kept params] = project_events_into_feature_space(CEs,params);
+    [fsp params] = design_feature_space(CEs, params);
     save_event_file(dirs, fsp, 'feature_space_pentatrodes');
-    save_event_file(dirs, p.which_kept, 'which_kept');
+    save_event_file(dirs, params, 'feature_space_params');
     create_log(dirs,'A1.fsp.generated');
   else
-    which_kept = get_event_file(dirs,'which_kept');
+    params = get_event_file(dirs,'feature_space_params');
   end
   
   % remove duplicates from CEs
-  fprintf_bullet('removing duplicates',2); t2=clock;
-  CEs.time_smp = CEs.time_smp(which_kept); fprintf('.');
-  CEs.time_ms  = CEs.time_ms(which_kept); fprintf('.');
-  CEs.time_absolute_s = CEs.time_absolute_s(which_kept,:); fprintf('.');
-  CEs.trigger  = CEs.trigger(which_kept); fprintf('.');
-  CEs.shape    = CEs.shape(which_kept,:,:); fprintf('.');
-  CEs.timestamps = CEs.timestamps(which_kept); fprintf('.');
-  CEs.fsp_params = params;
+  CEs = remove_duplicates_from_CEs(CEs, params);
   
-  save_event_file(dirs,CEs,'candidate_events_pentatrodes');  fprintf('.');
-  create_log(dirs,'A1.candidate.events.pentatrodes.compiled');
-  fprintf('.');
+  % save CEs
+  save_event_file(dirs,CEs,'candidate_events_pentatrodes');
+
+  
+  % calculate feature space representation for all data
+  % -------------------------------------------------------
+  
+  fprintf('calculating fsp for each sweep');
+  p = 0; t2 = clock;
+  % run through sweeps
+  for ii=1:L(swl)
+    p = print_progress(ii,L(swl),p);
+    params = try_rmfield(params, {'which_kept'});
+    % compile for that sweep
+    CEs = compile_candidate_event_database(dirs, swl(ii), 'silent');
+    [fsp params] = project_events_into_feature_space(CEs, params);
+    CEs = remove_duplicates_from_CEs(CEs, params);
+    % save
+    save_sweep_file(dirs, swl(ii).timestamp, fsp, 'fsp');
+    save_sweep_file(dirs, swl(ii).timestamp, CEs, 'fsp_CEs');
+  end
   fprintf_timediff(t2);
+  
+  
+  % done - add to log
+  create_log(dirs,'A1.candidate.events.pentatrodes.compiled');
+
   
 end
 fprintf_timediff(t1);
 
 
-%% do not delete sweeps
-% =======================
+%% delete sweeps
+% =================
 
 %fprintf_bullet('cleaning up...');
 %rmdir(dirs.sweeps,'s');

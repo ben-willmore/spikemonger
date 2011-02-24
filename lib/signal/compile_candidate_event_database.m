@@ -1,5 +1,13 @@
-function CEs = compile_candidate_event_database(dirs,swl)
+function CEs = compile_candidate_event_database(dirs,swl,varargin)
   % CEs = compile_candidate_event_database(dirs,swl)
+  
+  % print stuff
+  verbose = true;
+  if nargin>2
+    if ismember('silent',varargin)
+      verbose = false;
+    end
+  end
   
 %% calculate timestamps
 % ======================
@@ -25,9 +33,11 @@ function CEs = compile_candidate_event_database(dirs,swl)
   % first, load all the sweep CEs
   n.sweeps = L(swl);
   cets = cell(1,n.sweeps);
-  fprintf_bullet('loading candidate events',2); p=0; t1=clock;
+  if verbose,
+    fprintf_bullet('loading candidate events',2); p=0; t1=clock;
+  end
   for ii=1:n.sweeps
-    p = print_progress(ii,n.sweeps,p);
+    if verbose, p = print_progress(ii,n.sweeps,p); end
     ts = swl(ii).timestamp;  
     sweep_start_time = tss(ii);    
     cet = get_sweep_file(dirs, ts, 'candidate_events');
@@ -37,7 +47,7 @@ function CEs = compile_candidate_event_database(dirs,swl)
     cets{ii} = cet;
   end
   cets = cell2mat(cets);
-  fprintf_timediff(t1);
+  if verbose, fprintf_timediff(t1); end
 
   % initialise a structure to put them in
   n.ces = sum([cets.n_ces]);
@@ -60,22 +70,18 @@ function CEs = compile_candidate_event_database(dirs,swl)
   % import shapes
   sh = get_sweep_file(dirs, ts, 'shapes');  
   CEs.shape = nan(n.ces, size(sh,2), size(sh,3), 'single');
-  fprintf_bullet('loading shapes',2); p=0; t1=clock;
+  if verbose
+    fprintf_bullet('loading shapes',2); p=0; t1=clock;
+  end
   count = 0;
   for ii=1:n.sweeps
-    p = print_progress(ii,n.sweeps,p);
+    if verbose, p = print_progress(ii,n.sweeps,p); end
     jjs = count + (1:cets(ii).n_ces);
     ts = swl(ii).timestamp;    
     sh = get_sweep_file(dirs, ts, 'shapes');
     CEs.shape(jjs,:,:) = sh;
     count = count + cets(ii).n_ces;
   end
-  fprintf_timediff(t1);
-  
-  %{
-  % check there are no nans
-  if any(isnan(CEs.time_smp(:))) | any(isnan(CEs.time_ms(:))) ...
-      | any(isnan(CEs.trigger(:))) | any(isnan(CEs.shape(:)))
-    error('internal:error','did not do CE aggregation properly');
+  if verbose
+    fprintf_timediff(t1);
   end
-  %}

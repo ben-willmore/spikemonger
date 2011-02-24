@@ -15,7 +15,6 @@ def.include_trigger = false;
 def.use_pentatrodes = false;
 % these must be there
 def.mean_event = [];
-def.which_kept = [];
 def.v = [];
 
 % parse params
@@ -29,11 +28,9 @@ if ~isempty(setdiff(fp,fd))
 end
 
 % error if required fields are missing
-if ~ismember('which_kept',fp) 
-  error('input:error','missing param field: which_kept');
-elseif ~ismember('mean_event',fp)
+if ~ismember('mean_event',fp)
   error('input:error','missing param field: mean_event');
-  elseif ~ismember('v',fp)
+elseif ~ismember('v',fp)
   error('input:error','missing param field: v (eigenvectors)');
 end
 

@@ -93,7 +93,7 @@ end
 %}
 
 %% cluster, pentatrode time
-% ========================
+% ============================
 
 fprintf('clustering, pentatrodes with time:\n\n');
 
@@ -122,3 +122,10 @@ else
   fprintf(['\n' n2s(clusters.n_clusters) ' clusters found.  [' timediff(t1,clock) ']\n\n']);
 
 end
+
+
+%% assign to clusters
+% ======================
+
+
+
