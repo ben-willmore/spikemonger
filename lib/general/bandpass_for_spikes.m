@@ -6,8 +6,8 @@ function signal = bandpass_for_spikes(signal,fs)
 
   % construct filter
   Wp = [300 3000];
-  n = 6;
-  [z,p,k] = ellip(n, 0.01, 40, Wp/(fs/2));
+  n = 4;
+  [z,p,k] = ellip(n, 1, 40, Wp/(fs/2));
   [sos,g] = zp2sos(z,p,k);
   Hd = dfilt.df2tsos(sos,g);
   

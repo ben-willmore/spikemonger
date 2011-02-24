@@ -45,6 +45,7 @@ dirs = fix_dirs_struct(dirs.root);
 
 
 %% run on data set
+% ====================
 
 t0 = clock;
 
@@ -52,14 +53,6 @@ A1_convert_bwvts(dirs);
 A2_autocut_clusters(dirs);
 A3_analyse_clusters(dirs,'clusters_pentatrodes');
 
-%{
-try
-  dirstr = dirs.root(head(tail(strfind(dirs.root,'/'),2))+1:end-1);
-catch
-  dirstr = droptail(dirs.root);
-end
-fprintf_subtitle(['total time for ' dirstr ':   *** ' timediff(t0,clock) ' ***']);
-%}
 
 end
 

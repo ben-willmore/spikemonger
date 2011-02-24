@@ -21,16 +21,21 @@ end
 %% parse input
 % =============
 
-if nargin==1
-  try
-    swl = get_event_file(dirs,'sweep_list');
-  catch
-    fprintf_bullet('aggregating sweeps...');
-    t1 = clock;
-    swl = get_sweep_list(dirs);
-    save_event_file(dirs,swl,'sweep_list');
-    fprintf_timediff(t1);
+% get the sweep list
+try
+  if nargin==1
+    try
+      swl = get_event_file(dirs,'sweep_list');
+    catch
+      fprintf_bullet('aggregating sweeps...');
+      t1 = clock;
+      swl = get_sweep_list(dirs);
+      save_event_file(dirs,swl,'sweep_list');
+      fprintf_timediff(t1);
+    end
   end
+catch
+  swl = get_event_file(dirs,'sweep_list');
 end
 
 
@@ -98,9 +103,7 @@ if does_log_exist(dirs,'A2.clustered.pentatrodes')
   
 else    
   % retrieve feature space
-  %CEs = get_event_file(dirs,'candidate_events_pentatrodes');
   fsp = get_event_file(dirs,'feature_space_pentatrodes');
-  %params = CEs.fsp_params;
 
   % add random noise to fsp
   for ii=1:(size(fsp,2)-1)
