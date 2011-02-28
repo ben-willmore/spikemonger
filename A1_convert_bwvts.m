@@ -259,12 +259,12 @@ create_log(dirs,'A1.finished');
 end
 
 
-%% HELPER FUNCTION
+%% HELPER FUNCTION for parallel
 function sfce(dirs,swlt)
-timestamp = swlt.all_files(1).timestamp;
-candidate_events = find_candidate_events(dirs, swlt);
-shapes = candidate_events.shape;
-candidate_events = rmfield(candidate_events,'shape');
-save_sweep_file(dirs, timestamp, candidate_events, 'candidate_events');
-save_sweep_file(dirs, timestamp, shapes, 'shapes');
+  timestamp = swlt.all_files(1).timestamp;
+  candidate_events = find_candidate_events(dirs, swlt);
+  shapes = candidate_events.shape;
+  candidate_events = rmfield(candidate_events,'shape');
+  save_sweep_file(dirs, timestamp, candidate_events, 'candidate_events');
+  save_sweep_file(dirs, timestamp, shapes, 'shapes');
 end

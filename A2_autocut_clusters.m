@@ -11,9 +11,9 @@ dirs = fix_dirs_struct(dirs);
 fprintf_subtitle('(2) clustering');
 
 % terminate if all clustering has already been done
-if does_log_exist(dirs,'A2.clustered.full') ...
-    & does_log_exist(dirs,'A2.clustered.full_no_time') ...
-    & does_log_exist(dirs,'A2.clustered.pentatrodes')
+if does_log_exist(dirs,'A2.clustered.training.full') ...
+    & does_log_exist(dirs,'A2.clustered.training.full_no_time') ...
+    & does_log_exist(dirs,'A2.clustered.training.pentatrodes')
   fprintf_bullet('already done.\n');
   return;
 end
@@ -44,10 +44,10 @@ end
 % ============================
 
 %{
-fprintf('clustering, full with time:\n\n');
+fprintf('clustering training data, full with time:\n\n');
 
 % already done?
-if does_log_exist(dirs,'A2.clustered.full')
+if does_log_exist(dirs,'A2.clustered.training.full')
   fprintf_bullet('already done.\n\n');
   
 else  
@@ -64,7 +64,7 @@ else
 
   % save
   save_event_file(dirs,clusters,'clusters_full');
-  create_log(dirs,'A2.clustered.full');
+  create_log(dirs,'A2.clustered.training.full');
   fprintf(['\n' n2s(clusters.n_clusters) ' clusters found.  [' timediff(t1,clock) ']\n\n']);
 end
 %}
@@ -74,9 +74,9 @@ end
 %{
 
 % already done?
-fprintf('clustering, excluding time:\n');
+fprintf('clustering training data, excluding time:\n');
 
-if does_log_exist(dirs,'A2.clustered.no_time')
+if does_log_exist(dirs,'A2.clustered.training.no_time')
   fprintf_bullet('already done.\n');
   
 else
@@ -87,7 +87,7 @@ else
 
   % save
   save_event_file(dirs,clusters,'clusters_no_time');
-  create_log(dirs,'A2.clustered.no_time');
+  create_log(dirs,'A2.clustered.training.training.no_time');
   fprintf_title([n2s(clusters.n_clusters) ' clusters found.  [' timediff(t1,clock) ']']);
 end
 %}
@@ -95,10 +95,10 @@ end
 %% cluster, pentatrode time
 % ============================
 
-fprintf('clustering, pentatrodes with time:\n\n');
+fprintf('clustering training data, pentatrodes with time:\n\n');
 
 % already done?
-if does_log_exist(dirs,'A2.clustered.pentatrodes')
+if does_log_exist(dirs,'A2.clustered.training.pentatrodes')
   fprintf_bullet('already done.\n\n');
   
 else    
@@ -117,37 +117,57 @@ else
   %clusters.params = params;
 
   % save
-  save_event_file(dirs,clusters,'clusters_pentatrodes');
-  create_log(dirs,'A2.clustered.pentatrodes');
+  save_event_file(dirs,clusters,'clusters_pentatrodes_training');
+  create_log(dirs,'A2.clustered.training.pentatrodes');
   fprintf(['\n' n2s(clusters.n_clusters) ' clusters found.  [' timediff(t1,clock) ']\n\n']);
 
 end
 
 
-%% assign to clusters
-% ======================
+%% re-assign each sweep's CEs to clusters
+% ==========================================
 
-n.c = clusters.n_clusters;
-n.u = size(fsp,1);
 
-P = nan(n.c, n.u);
+fprintf('clustering all data, based on training clusters');
 
-for ii=2:n.c
-  w = clusters.W(ii);
-  m = clusters.M(:,ii);
-  v = clusters.V(:,:,ii);
-%   vinv = inv(v);
-  X = fsp - repmat(m', n.u, 1);
+% already done?
+if does_log_exist(dirs,'A2.clustered.pentatrodes')
+  fprintf_bullet('\nalready done.\n\n');
+
+else
   
-  
-  a = log(w) - 0.5*logdet(v) - 0.5*log(2*pi);
-  %a = 0;
-  
-  P(ii,:) = a - 0.5*sum(X'.*(v\X'));
-  
-%   for jj=1:n.u
-%     x = X(jj,:);
-%     P(ii,jj) = a - 0.5 * x*vinv*x';
-%   end
+  p = 0; t1 = clock; 
+  for ii=1:L(swl)
+    p = print_progress(ii,L(swl),p);
+    
+    % get feature space
+    fsp = get_sweep_file(dirs, swl(ii).timestamp, 'fsp');
+    n.u = size(fsp,1);
+    n.c = clusters.n_clusters;
+    n.d = size(fsp,2);
+
+    % calculate the respective probabilities for each cluster
+    % ----------------------------------------------------------
+
+    % initialise
+    logP = nan(n.c, n.u);
+    % constant class
+    logP(1,:) = log(clusters.W(1));
+    % for each cluster
+    for ii=2:n.c
+      w = clusters.W(ii);
+      m = clusters.M(:,ii);
+      v = clusters.V(:,:,ii);
+      x = (fsp - repmat(m',n.u,1))';
+      logP(ii,:) = -0.5 * sum(x .* (v\x)) - 0.5*logdet(v) - 0.5*n.d*log(2*pi);
+    end
+    % best cluster assignment
+    [junk C] = max(logP);
+
+    % save
+    save_sweep_file(dirs, swl(ii).timestamp, C, 'clusters_pentatrodes');
+    create_log(dirs,'A2.clustered.pentatrodes');
+
+  end
+  fprintf_timediff(t1);
 end
-
