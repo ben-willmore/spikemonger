@@ -92,15 +92,15 @@ if subset_size==1
     %ns = str2double(C(pos.class+1));
     W = str2double(P(pos.weight+1));
     
-    M = nan(D, n.clusters);
-    for ii=1:n.clusters
-      M(:,ii) = str2double(P(pos.mean(ii) + (1:D)));
-    end
-    
-    V = nan(D, D, n.clusters);
-    for ii=1:n.clusters
-      V(:,:,ii) = reshape(str2double(P(pos.cov(ii) + (1:(D^2)))),D,D)';
-    end
+%     M = nan(D, n.clusters);
+%     for ii=1:n.clusters
+%       M(:,ii) = str2double(P(pos.mean(ii) + (1:D)));
+%     end
+%     
+%     V = nan(D, D, n.clusters);
+%     for ii=1:n.clusters
+%       V(:,:,ii) = reshape(str2double(P(pos.cov(ii) + (1:(D^2)))),D,D)';
+%     end
     
   catch
     keyboard;
@@ -113,6 +113,34 @@ else
   M = [];
   V = [];
 end
+
+%% recalculate cluster statistics
+% =================================
+
+
+% get cluster data
+n.u = size(fsp,1);
+n.dims = size(fsp,2);
+
+% preconstruct
+W = nan(1, n.clusters);
+M = nan(n.dims, n.clusters);
+V = nan(n.dims, n.dims, n.clusters);
+
+% constant cluster
+W(1) = (sum(C==1)+1) / (n.u + 1);  % added one for the noise point
+
+% main clusters
+for ii=2:n.clusters
+  
+  tok = (C==ii);
+  W(ii) = sum(tok) / (n.u + 1);  % added one for the noise point
+  M(:,ii) = mean(fsp(tok,:))';
+  V(:,:,ii) = cov(fsp(tok,:));
+  
+end
+
+
 
 %% prepare output
 % =================
