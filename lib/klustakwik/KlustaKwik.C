@@ -222,9 +222,11 @@ void SaveParams(KK &OutputKK) {
 
     fprintf(fp,"\nMean:\n");
     MatPrint(fp, OutputKK.Mean.m_Data + c*OutputKK.nDims, 1, OutputKK.nDims);
+    //MatPrint(fp, OutputKK.Mean.m_Data, 1, OutputKK.nDims);
 
     fprintf(fp,"\nCov:\n");
     MatPrint(fp, OutputKK.Cov.m_Data + c*OutputKK.nDims2, OutputKK.nDims, OutputKK.nDims);
+    //MatPrint(fp, OutputKK.Cov.m_Data, OutputKK.nDims, OutputKK.nDims);
     fprintf(fp,"\n");
   }
   fclose(fp);
@@ -284,7 +286,7 @@ void TriSolve(float *M, float *x, float *Out, int D) {
     sum = x[i];
     for (j=i-1; j>=0; j--) sum -= M[i*D + j] * Out[j]; // j<i
 		
-    //		for (pM=M + i*D + i-1, pOut = Out + i-1; pOut>=Out; pM--, pOut--) sum -= *pM * *pOut;
+    //	for (pM=M + i*D + i-1, pOut = Out + i-1; pOut>=Out; pM--, pOut--) sum -= *pM * *pOut;
     Out[i] = sum / M[i*D + i];
   }
 }
@@ -556,7 +558,8 @@ void KK::EStep() {
       if (
 	  !FullStep
 	  //              Class[p] == OldClass[p]
-	  //				&& LogP[p*MaxPossibleClusters+c] - LogP[p*MaxPossibleClusters+Class[p]] > DistThresh
+	  //				&& LogP[p*MaxPossibleClusters+c] 
+	  //                              - LogP[p*MaxPossibleClusters+Class[p]] > DistThresh
 	  && OptPtrClass[p] == OptPtrOldClass[p]
 	  && OptPtrLogP[c] - OptPtrLogP[OptPtrClass[p]] > DistThresh				
 	  ) {
