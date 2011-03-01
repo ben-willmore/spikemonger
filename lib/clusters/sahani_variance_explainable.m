@@ -48,7 +48,7 @@ for ii=1:L(data)
   end
   
   % calculate v explainable
-  v.individual.total_power(ii) = var(mean(h));
+  v.individual.total_power(ii) = mean(var(h));
   v.individual.signal_power(ii) = 1/(N-1) * (N * var(mean(h)) - mean(var(h,[],2)));
   v.individual.noise_power(ii) = v.individual.total_power(ii) - v.individual.signal_power(ii);
   v.individual.noise_ratio(ii) = v.individual.noise_power(ii) / v.individual.signal_power(ii);
