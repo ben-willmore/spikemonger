@@ -68,7 +68,7 @@ C = C(2:end);
 %% read clustering parameters
 % =============================
 
-if subset_size==1
+if false %subset_size==1
   try
     % read
     fid = fopen(['.temp/X_' randstr '.param.1'],'rt');
@@ -92,15 +92,15 @@ if subset_size==1
     %ns = str2double(C(pos.class+1));
     W = str2double(P(pos.weight+1));
     
-%     M = nan(D, n.clusters);
-%     for ii=1:n.clusters
-%       M(:,ii) = str2double(P(pos.mean(ii) + (1:D)));
-%     end
-%     
-%     V = nan(D, D, n.clusters);
-%     for ii=1:n.clusters
-%       V(:,:,ii) = reshape(str2double(P(pos.cov(ii) + (1:(D^2)))),D,D)';
-%     end
+    M = nan(D, n.clusters);
+    for ii=1:n.clusters
+      M(:,ii) = str2double(P(pos.mean(ii) + (1:D)));
+    end
+    
+    V = nan(D, D, n.clusters);
+    for ii=1:n.clusters
+      V(:,:,ii) = reshape(str2double(P(pos.cov(ii) + (1:(D^2)))),D,D)';
+    end
     
   catch
     keyboard;
@@ -112,6 +112,7 @@ else
   W = [];
   M = [];
   V = [];
+  
 end
 
 %% recalculate cluster statistics
