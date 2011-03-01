@@ -172,3 +172,11 @@ else
   create_log(dirs,'A2.clustered.pentatrodes');
   fprintf_timediff(t1);
 end
+
+
+%% delete sweeps
+% =================
+
+%fprintf_bullet('cleaning up...');
+%rmdir(dirs.sweeps,'s');
+%fprintf('[ok]\n');

@@ -9,17 +9,29 @@ function CEs = compile_candidate_event_database(dirs,swl,varargin)
     end
   end
   
+  % reference timestamp
+  reference_timestamp = swl(1).timestamp;
+  if nargin>2
+    is_match = cellfun(@(x) isequal('reference_timestamp',x), varargin);
+    if any(is_match)
+      reference_timestamp = varargin{find(is_match)+1};
+    end
+  end
+  
 %% calculate timestamps
 % ======================
 
   % timestamps
   tss = {swl.timestamp};
   
-  % convert to vecotrs
+  % convert to vectors
   tss = datevec(datenum(tss,'yyyymmdd-HHMMSSFFF'));
   
+  % reference timestamp
+  tss_ref = datevec(datenum(reference_timestamp,'yyyymmdd-HHMMSSFFF'));
+  
   % subtract the first one
-  tss = tss - repmat(tss(1,:),size(tss,1),1);
+  tss = tss - repmat(tss_ref,size(tss,1),1);
   
   % put into seconds form
   tss = datevec(datenum(tss));

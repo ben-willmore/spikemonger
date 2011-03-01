@@ -220,14 +220,15 @@ if ~does_log_exist(dirs,'A1.candidate.events.pentatrodes.compiled')
   % calculate feature space representation for all data
   % -------------------------------------------------------
   
-  fprintf_bullet('calculating feature space for each sweep\n');
+  fprintf_bullet('calculating feature space for each sweep');
   p = 0; t2 = clock;
   % run through sweeps
   for ii=1:L(swl)
     p = print_progress(ii,L(swl),p);
     params = try_rmfield(params, {'which_kept'});
     % compile for that sweep
-    CEs = compile_candidate_event_database(dirs, swl(ii), 'silent');
+    CEs = compile_candidate_event_database(dirs, swl(ii), 'silent', ...
+      'reference_timestamp', swl(1).timestamp);
     [fsp params] = project_events_into_feature_space(CEs, params);
     CEs = remove_duplicates_from_CEs(CEs, params);
     % split into shape and non-shape
@@ -246,16 +247,8 @@ if ~does_log_exist(dirs,'A1.candidate.events.pentatrodes.compiled')
 
   
 end
+
 fprintf_timediff(t1);
-
-
-%% delete sweeps
-% =================
-
-%fprintf_bullet('cleaning up...');
-%rmdir(dirs.sweeps,'s');
-%fprintf('[ok]\n');
-
 create_log(dirs,'A1.finished');
 
 

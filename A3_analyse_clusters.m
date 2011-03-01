@@ -71,12 +71,12 @@ n.shapes_per_cluster = 1000;
 n.shapes_total = n.shapes_per_cluster * n.c;
 
 % example indices
-eg_idx = cell(n.c, 1);
+eg_idx = cell(n.c, 2);
 for cc=1:n.c
   % index within sweep
   idx2 = map_to_cell(@(x) find([x.C==cc]), CEs);
   % sweep index
-  idx1 = map_to_cell(@(ii) idx2{ii}*0 + ii, 1:L(all_egs));
+  idx1 = map_to_cell(@(ii) idx2{ii}*0 + ii, 1:L(idx2));
   % concatenate
   idx1 = cell2mat(idx1');
   idx2 = cell2mat(idx2');
@@ -87,31 +87,58 @@ for cc=1:n.c
   else
     idx_to_use = randsample(n_idx, n.shapes_per_cluster);
   end
+  eg_idx{cc,1} = idx1(idx_to_use);
+  eg_idx{cc,2} = idx2(idx_to_use);
 end
 
-%% shape examples
-% =================
+%% run through and collect the shapes
+% -----------------------------------
 
-% get the parameters
-s = size(CEs.shape);
-n.ch = s(3);
-n.sh_per_c = 1000;
-n.sh_total = n.sh_per_c * n.c;
-
-% which examples to use
-eg_idxs = cell(n.c,1);
+% get example shape
+sh = get_sweep_file(dirs, swl(1).timestamp, 'fsp_CE_shapes');
+n.channels = size(sh,3);
+n.time_points = size(sh,2);
+% get example fsp
+fsp = get_sweep_file(dirs, swl(1).timestamp, 'fsp');
+n.fsp_dims = size(fsp,2);
+% initialise shape/fsp cell
+[sh fsp] = IA(cell(n.c, 1));
 for cc=1:n.c
-  eg_idxs{cc} = find(c.C==cc);
-  eg_idxs{cc} = eg_idxs{cc}( head(randperm(L(eg_idxs{cc})), min(L(eg_idxs{cc}),n.sh_per_c) ) );
+  sh{cc} = nan(L(eg_idx{cc,1}), n.time_points, n.channels);
+  fsp{cc} = nan(L(eg_idx{cc,1}), n.fsp_dims);
 end
-n.eg_shapes = sum(Lincell(eg_idxs));
+% start filling these
+for ii=1:L(swl)
+  % get sweep shapes and fsp, put in temp files
+  sht = get_sweep_file(dirs, swl(ii).timestamp, 'fsp_CE_shapes');
+  fspt = get_sweep_file(dirs, swl(ii).timestamp, 'fsp');
+  for cc=1:n.c
+    % which shapes have been picked to represent this sweep and cluster
+    tok = eg_idx{cc,1}==ii;
+    % save them into sh
+    sh{cc}(tok,:,:) = sht(eg_idx{cc,2}(tok),:,:);
+    fsp{cc}(tok,:) = fspt(eg_idx{cc,2}(tok),:);
+  end
+end
+clear sht;
+% check that sh and fsp have no more nans
+if any(cellfun(@(x) any(pickall(isnan(x))), sh))
+  fprintf('sh has nans - debug\n');
+  keyboard;
+elseif any(cellfun(@(x) any(pickall(isnan(x))), fsp))
+  fprintf('fsp has nans - debug\n');
+  keyboard;
+end
 
-% pick out examples
-sh = CEs.shape(cell2mat(eg_idxs),:,:);
-
-
-
-
+% put CEs together
+CEs2 = struct;
+fields = fieldnames(CEs);
+for ff=1:L(fields)
+  fi = fields{ff};
+  CEs2.(fi) = reach(CEs, [fi ''''])';
+end
+CEs = CEs2; 
+clear CEs2;
 
 %% divide up into sets
 % ======================
@@ -146,11 +173,7 @@ for ii=1:L(usp)
 end
 n.set = L(st);
 
-
-%% some parameters
-% ===================
-
-% histograms
+% parameters for histograms
 maxt = ceil(max([sp.length_signal_ms]));
 dhs = [2 5 10 25];
 
@@ -164,7 +187,7 @@ for cc=1:n.c
   p = print_progress(cc,n.c,p);
   
   % find events
-  tok = c.C==cc;
+  tok = CEs.C==cc;
   n.events = sum(tok);
 
   
@@ -184,9 +207,7 @@ for cc=1:n.c
   save_cluster_file(dirs,cc,event.time_absolute_s,'event_time_absolute_s');
 
   % event shape across the different channels
-  idx_is = droptail(cumsum([0; Lincell(eg_idxs)])) + 1;
-  idx_fs = drophead(cumsum([0; Lincell(eg_idxs)]));
-  event.shape = sh(idx_is(cc):idx_fs(cc),:,:);
+  event.shape = sh{cc};
   save_cluster_file(dirs,cc,event.shape,'event_shape');
 
   % sweep timestamp
@@ -251,8 +272,8 @@ for cc=1:n.c
   
   
   % feature space representation
-  event.fsp = fsp(tok,:);
-  save_cluster_file(dirs,cc,event.fsp,'event_fsp');
+   event.fsp = fsp{cc};
+   save_cluster_file(dirs,cc,event.fsp,'event_fsp');
   
   % psth - all sets
   psth.all_sets = struct;
@@ -354,6 +375,7 @@ for cc=1:n.c
   save_cluster_file(dirs,cc,sve,'sahani_variance_explainable');
   
 end
+
 create_log(dirs,['A3.' cluster_type '.statistics.calculated']);
 fprintf_timediff(t1);
 
