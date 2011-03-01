@@ -137,6 +137,7 @@ if does_log_exist(dirs,'A2.clustered.pentatrodes')
 else
   
   p = 0; t1 = clock; 
+  
   for ii=1:L(swl)
     p = print_progress(ii,L(swl),p);
     
@@ -154,20 +155,20 @@ else
     % constant class
     logP(1,:) = log(clusters.W(1));
     % for each cluster
-    for ii=2:n.c
-      w = clusters.W(ii);
-      m = clusters.M(:,ii);
-      v = clusters.V(:,:,ii);
+    for cc=2:n.c
+      w = clusters.W(cc);
+      m = clusters.M(:,cc);
+      v = clusters.V(:,:,cc);
       x = (fsp - repmat(m',n.u,1))';
-      logP(ii,:) = -0.5 * sum(x .* (v\x)) - 0.5*logdet(v) - 0.5*n.d*log(2*pi);
+      logP(cc,:) = -0.5 * sum(x .* (v\x)) - 0.5*logdet(v) - 0.5*n.d*log(2*pi);
     end
     % best cluster assignment
     [junk C] = max(logP);
 
     % save
     save_sweep_file(dirs, swl(ii).timestamp, C, 'clusters_pentatrodes');
-    create_log(dirs,'A2.clustered.pentatrodes');
 
   end
+  create_log(dirs,'A2.clustered.pentatrodes');
   fprintf_timediff(t1);
 end

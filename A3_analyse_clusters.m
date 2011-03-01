@@ -32,34 +32,62 @@ if does_log_exist(dirs,['A3.' cluster_type '.statistics.calculated']);
   return;
 end
 
-%% load
+%% load candidate events and clusters
+% =====================================
+
 fprintf_bullet('loading cluster data...');
 swl = get_event_file(dirs,'sweep_list');
 ts = get_timestamps_from_swl(swl);
 sweep_params = get_event_file(dirs,'sweep_params');
 
-switch cluster_type
-  case 'clusters_full'
-    CEs = get_event_file(dirs,'candidate_events_full');
-    fsp = get_event_file(dirs,'feature_space_full');
-  case 'clusters_pentatrodes'
-    CEs = get_event_file(dirs,'candidate_events_pentatrodes');
-    fsp = get_event_file(dirs,'feature_space_pentatrodes');
-  case 'clusters_full_no_time'
-    CEs = get_event_file(dirs,'candidate_events_full');
-    fsp = get_event_file(dirs,'feature_space_full');
-    fsp = fsp(:,1:(end-1));
-end
-
-% load cluster
-c = get_event_file(dirs,cluster_type);
+% load clustering data
+c = get_event_file(dirs, [cluster_type '_training']);
+c = try_rmfield(c,{'C'});
 n.c = c.n_clusters;
+
+% load candidate events
+CEs = cell(1,L(swl));
+for ii=1:L(swl)
+  switch cluster_type
+    case 'clusters_pentatrodes'
+      CEs{ii} = get_sweep_file(dirs,swl(ii).timestamp, 'fsp_CEs');
+      CEs{ii}.C = get_sweep_file(dirs,swl(ii).timestamp, 'clusters_pentatrodes')';
+    otherwise
+      error('type:unimplemented','need to implement this!');
+  end
+end
+CEs = cell2mat(CEs);
 
 % prepare target dir
 dirs.cluster = [dirs.root cluster_type '/'];
 mkdir_nowarning(dirs.cluster);
 fprintf_timediff(t1);
 
+%% shape examples
+% ================
+
+% get the parameters
+n.shapes_per_cluster = 1000;
+n.shapes_total = n.shapes_per_cluster * n.c;
+
+% example indices
+eg_idx = cell(n.c, 1);
+for cc=1:n.c
+  % index within sweep
+  idx2 = map_to_cell(@(x) find([x.C==cc]), CEs);
+  % sweep index
+  idx1 = map_to_cell(@(ii) idx2{ii}*0 + ii, 1:L(all_egs));
+  % concatenate
+  idx1 = cell2mat(idx1');
+  idx2 = cell2mat(idx2');
+  % examples to use
+  n_idx = L(idx1);
+  if n_idx < n.shapes_per_cluster
+    idx_to_use = 1:n_idx;
+  else
+    idx_to_use = randsample(n_idx, n.shapes_per_cluster);
+  end
+end
 
 %% shape examples
 % =================
