@@ -3,7 +3,7 @@ setpath;
 % rootdir, based on source computer
 compname = get_current_computer_name;
 if strcmp(compname,'macgyver');
-  rootdir = './eg/';
+  rootdir = '/shub/experiments/comod.expt01/';
 elseif strcmp(compname,'blueweasel');
   rootdir = 'data/';
 elseif strcmp(compname,'welshcob');
@@ -237,6 +237,13 @@ while continue_loop
     case 'I' % fix ISIs ~ 50Hz
       C_backup = C;
       [C n_harmonics] = cluster_fix_isis_50Hz_2(C,todo{2},dirs,cols);
+      if n_harmonics > 0
+        history = update_history(history(1:end-1), [todo n_harmonics], dirs);
+      end
+      
+    case 'J' % fix ISIs ~ 100Hz
+      C_backup = C;
+      [C n_harmonics] = cluster_fix_isis_100Hz_2(C,todo{2},dirs,cols);
       if n_harmonics > 0
         history = update_history(history(1:end-1), [todo n_harmonics], dirs);
       end

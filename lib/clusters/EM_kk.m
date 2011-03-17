@@ -141,6 +141,38 @@ for ii=2:n.clusters
   
 end
 
+%% recalculate W(1)
+% ===================
+
+% for some reason, the calculation above does not work for the
+% constant class, but it does work for all the others.
+%
+% ie it can replicate the values of the probabilities for the
+% non-constant (gaussian) classes, but not for the constant
+% class. To find the appropriate setting for the constant
+% class, the appropriate weight for the constant class is
+% guessed based on klustakwik's cluster assignment.
+
+% calculate logP for training data
+logP = nan(n.clusters, n.u);
+for cc=2:n.clusters
+  w = W(cc);
+  m = M(:,cc);
+  v = V(:,:,cc);
+  x = (fsp - repmat(m',n.u,1))';
+  logP(cc,:) = -0.5 * sum(x .* (v\x)) - 0.5*logdet(v) - 0.5*n.dims*log(2*pi);
+end
+
+% look at those for whom cluster 1 was assigned
+% to set an upper limit for logP for the constant class
+upper_limit = maxall(logP(2:end, C==1));
+
+% look at those for whom other clusters were assigned
+% to set a lower limit for logP for the constant class
+lower_limit = min(max(logP(2:end, ~(C==1))));
+
+% bisect and exponentiate to get W(1)
+W(1) = exp(0.5*(lower_limit + upper_limit));
 
 
 %% prepare output

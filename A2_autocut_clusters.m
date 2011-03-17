@@ -138,6 +138,10 @@ else
   
   p = 0; t1 = clock; 
   
+  if ~exist('clusters','var')
+    clusters = get_event_file(dirs, 'clusters_pentatrodes_training');
+  end
+  
   for ii=1:L(swl)
     p = print_progress(ii,L(swl),p);
     

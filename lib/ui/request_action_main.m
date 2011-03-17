@@ -22,6 +22,7 @@ fprintf_bullet(['[c]:   cleave a cluster\n']);
 fprintf('\n');
 fprintf_bullet(['[i]:   fix cluster ISIs --  < 1 ms\n']);
 fprintf_bullet(['[I]:   fix cluster ISIs --  50 Hz\n']);
+fprintf_bullet(['[J]:   fix cluster ISIs --  100 Hz\n']);
 fprintf('\n');
 fprintf_bullet(['[s]:   save a cluster\n']);
 fprintf_bullet(['[S]:   save all clusters\n']);
@@ -35,7 +36,7 @@ fprintf('\n');
 fprintf_bullet(['[Q]:   quit\n']);
 fprintf('\n');
 
-todo{1} = demandinput('     >>> ',{'0','1','2','3','m','d','c','i','I','s','S','u','!','h','H','Q','k','p','P'});
+todo{1} = demandinput('     >>> ',{'0','1','2','3','m','d','c','i','I','J','s','S','u','!','h','H','Q','k','p','P'});
 
 
 % response
@@ -139,7 +140,7 @@ switch todo{1}
     return;
       
 
-  case {'d','i','I','s'} % delete / fix-ISI / save
+  case {'d','i','I','J','s'} % delete / fix-ISI / save
     todo{2} = demandnumberinput('\nWhich cluster?  >>> ', 0:n.c);
     if todo{2}==0, todo = []; return; end
     return; 

@@ -1,7 +1,7 @@
 function CEs = compile_candidate_event_database_for_large_data(dirs,swl)
   % CEs = compile_candidate_event_database(dirs,swl)
   
-  MAX_CEs = 10000;
+  MAX_CEs = 200000;
   
   %% calculate timestamps
   % ======================
