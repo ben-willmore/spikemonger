@@ -1,16 +1,6 @@
 function A1_convert_bwvts(dirs, varargin)
 % A1_convert_bwvts(dirs)
 % A1_convert_bwvts(root_directory)
-%
-% STAGE 1 OF SPIKEMONGER
-%   - convert .src files to .mat
-
-% ======================
-% SPIKEMONGER v1.0.0.2
-% ======================
-%   - NCR 26-May-2010
-%   - distributed under GPL v3 (see COPYING)
-
 
 % parse varargin
 % ================
@@ -66,7 +56,7 @@ if does_log_exist(dirs,'A1.bwvt.converted')
 else
   
   % directory contents
-  files = getfilelist(dirs.root,'bwvt');
+  files = getfilelist(dirs.raw_bwvt,'bwvt');
   files = files(~ismember({files.prefix},{'nothing'}));
   n.files = L(files);
   mkdir_nowarning(dirs.sweeps);

@@ -37,8 +37,11 @@ function directory = pickdir_for_cluster_ui(rootdir)
       
     end
     dirs = dirs(tokeep);
-    
+    try
     cluster_dirs = dirs([dirs.is_cluster_dir]);
+catch
+keyboard
+end
     dirs = dirs(~[dirs.is_cluster_dir]);
   
   % display

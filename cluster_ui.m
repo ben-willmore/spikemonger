@@ -3,7 +3,7 @@ setpath;
 % rootdir, based on source computer
 compname = get_current_computer_name;
 if strcmp(compname,'macgyver');
-  rootdir = '/shub/experiments/comod.expt01/';
+  rootdir = '/shub/experiments/data.expt26/';
 elseif strcmp(compname,'blueweasel');
   rootdir = 'data/';
 elseif strcmp(compname,'welshcob');
