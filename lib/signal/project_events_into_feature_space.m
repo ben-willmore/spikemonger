@@ -70,9 +70,12 @@ end
 % ==============
 
 % check that the mean vector is the right length
+if n.events > 0
 if ~( numel(CEs.shape(1,:,:)) == L(p.mean_event) )
   error('input:error', 'mean event has the wrong number of elements');
 end
+end
+
 
 % for each event, calculate the best time shift for maximum alignment with
 % the mean event vector.
