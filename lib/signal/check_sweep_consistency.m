@@ -74,7 +74,7 @@ for ii=1:L(swl)
   end
 
   % check that the sweep parameter values are consistent
-  if size(unique(reach(swp,'all.values')','rows')',2)~=1
+  if size(unique(reach(swp,'all.values''')','rows')',2)~=1
     error('bwvt:error','different sweep parameter values across channels');
   end
   

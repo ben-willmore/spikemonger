@@ -49,7 +49,7 @@ dirs = fix_dirs_struct(dirs.root);
 
 t0 = clock;
 
-A1_convert_bwvts(dirs);
+B1_convert_f32s(dirs);
 A2_autocut_clusters(dirs);
 A3_analyse_clusters(dirs,'clusters_pentatrodes');
 

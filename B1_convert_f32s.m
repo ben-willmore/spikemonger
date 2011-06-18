@@ -1,26 +1,21 @@
-function A1_convert_bwvts(dirs, varargin)
-% A1_convert_bwvts(dirs)
-% A1_convert_bwvts(root_directory)
+function B1_convert_f32s(dirs, varargin)
+% B1_convert_f32s(dirs)
+% B1_convert_f32s(root_directory)
 
-% parse varargin
+%% parse varargin
 % ================
 
 CAN_USE_PARALLEL = false;
-BWVTS_ONLY = false;
 
 FORCE_REDO = false;
 try
   if nargin>1
-    if any(ismember({'force_redo','forceredo','FORCE_REDO', ...
-        'FORCEREDO','redo','REDO'},varargin))
+    if any(ismember({'force_redo', 'forceredo', 'FORCE_REDO', ...
+        'FORCEREDO', 'redo', 'REDO'}, varargin))
       FORCE_REDO = true;
     end
-    if any(ismember({'parallel','can_use_parallel','PARALLEL','CAN_USE_PARALLEL'},varargin))
+    if any(ismember({'parallel', 'can_use_parallel', 'PARALLEL', 'CAN_USE_PARALLEL'}, varargin))
       CAN_USE_PARALLEL = true;
-    end
-    if any(ismember({'bwvts_only','bwvts','BWVTS','BWVTs', ...
-        'BWVTs_only'},varargin))
-      BWVTS_ONLY = true;
     end
   end
 catch
@@ -37,61 +32,71 @@ catch
 end
 
 % title
-fprintf_subtitle(['(1) converting bwvts']);
+fprintf_subtitle(['(1) converting f32s']);
 
 % terminate if A1 has already been finished
-if does_log_exist(dirs,'A1.finished')
+if does_log_exist(dirs, 'A1.finished')
   fprintf_bullet('already done.\n');
   return;
 end
 
 
-%% convert the bwvts
+%% convert the f32s
 % =====================
 
-if does_log_exist(dirs,'A1.bwvt.converted')
-  fprintf('bwvts already converted.\n');
+if does_log_exist(dirs, 'A1.f32s.converted')
+  fprintf('f32s already converted.\n');
   
   
 else
   
   % directory contents
-  files = getfilelist(dirs.raw_bwvt,'bwvt');
-  files = files(~ismember({files.prefix},{'nothing'}));
+  files = getfilelist(dirs.raw_f32, 'f32');
+  files = files(~ismember({files.prefix}, {'nothing'}));
   n.files = L(files);
   mkdir_nowarning(dirs.sweeps);
   
-  try
-    CAN_USE_PARALLEL;
-  catch
-    CAN_USE_PARALLEL = false;
+  % parse filenames
+  for ii=1:L(files)
+    sweep_idx = regexprep(files(ii).name, '^.*sweep.', '');
+    sweep_idx = regexprep(sweep_idx, '.channel.*', '');
+    sweep_idx = str2double(sweep_idx);
+    files(ii).sweep_idx = sweep_idx;
+
+    channel_idx = regexprep(files(ii).name, '^.*channel.', '');
+    channel_idx = regexprep(channel_idx, '.f32', '');
+    channel_idx = str2double(channel_idx);
+    files(ii).channel_idx = channel_idx;
   end
+
+  % load metadata
+  load([dirs.root 'gridInfo.mat']);
+  load([dirs.root 'sweepInfo.mat']);
+
   
   % try using parallel computation
   if CAN_USE_PARALLEL
-    fprintf(['converting bwvts (parallel):    [' n2s(n.files) ' files]:\n\n']);
+    fprintf(['converting f32s (parallel):    [' n2s(n.files) ' files]:\n\n']);
     parfor ii=1:n.files
-      convert_bwvt(dirs, files(ii), ii, n.files); %#ok<*PFBNS>
+      convert_benware_f32(dirs, files(ii), ii, n.files); %#ok<*PFBNS>
     end
     
     % if no parallel computation available
   else
-    fprintf('converting bwvts (non-parallel):\n\n');
+    fprintf('converting f32s (non-parallel):\n\n');
     for ii=1:n.files
       file = files(ii);
-      fprintf_numbered(file.name,ii,n.files);
-      convert_bwvt(dirs, file, ii, n.files)
+      sweep = sweeps(file.sweep_idx);
+      fprintf_numbered(file.name, ii, n.files);
+      convert_benware_f32(dirs, file, sweep)
     end
   end
   
   % write to log
-  create_log(dirs,'A1.bwvt.converted');
+  create_log(dirs, 'A1.f32s.converted');
   
 end
 
-if BWVTS_ONLY
-  return;
-end
 
 
 %% aggregate metadata
@@ -103,16 +108,16 @@ fprintf('\n\naggregating metadata:\n');
 fprintf_bullet('creating sweep list...');
 
 % load if it is already done
-if does_log_exist(dirs,'A1.swl.generated');
-  swl = get_event_file(dirs,'sweep_list');
-  sweep_params = get_event_file(dirs,'sweep_params');
+if does_log_exist(dirs, 'A1.swl.generated');
+  swl = get_event_file(dirs, 'sweep_list');
+  sweep_params = get_event_file(dirs, 'sweep_params');
   
 % if not, create it
 else
   swl = get_sweep_list(dirs);
-  [sweep_params swl] = check_sweep_consistency(dirs,swl);
-  save_event_file(dirs,swl,'sweep_list');
-  create_log(dirs,'A1.swl.generated');
+  [sweep_params swl] = check_sweep_consistency(dirs, swl);
+  save_event_file(dirs, swl, 'sweep_list');
+  create_log(dirs, 'A1.swl.generated');
 end
 fprintf('[ok]\n');
 
@@ -124,7 +129,7 @@ fprintf('[ok]\n');
 fprintf('\ndetecting candidate events:\n');
 
 % already done?
-if does_log_exist(dirs,'A1.candidate.events.detected')
+if does_log_exist(dirs, 'A1.candidate.events.detected')
   fprintf_bullet('already done.\n');
   
 else
@@ -142,13 +147,13 @@ else
     fprintf_bullet('searching through sweeps (non-parallel)');
     % run through each sweep
     for ii=1:L(swl)
-      p = print_progress(ii,L(swl),p);
+      p = print_progress(ii, L(swl), p);
       % retrieve the timestamp of the sweep
       timestamp = swl(ii).all_files(1).timestamp;
       % find candidate events and shapes
       candidate_events = find_candidate_events(dirs, swl(ii));
       shapes = candidate_events.shape;
-      candidate_events = rmfield(candidate_events,'shape');
+      candidate_events = rmfield(candidate_events, 'shape');
       n_CEs = L(candidate_events.time_smp);
       % save them
       save_sweep_file(dirs, timestamp, candidate_events, 'candidate_events');
@@ -158,7 +163,7 @@ else
   end
   
   % report that it is finished in the log
-  create_log(dirs,'A1.candidate.events.detected');
+  create_log(dirs, 'A1.candidate.events.detected');
   fprintf_timediff(t1);
 end
 
@@ -171,10 +176,10 @@ fprintf_bullet('compiling database:\n');
 t1 = clock;
 dirs = fix_dirs_struct(dirs);
 
-if ~does_log_exist(dirs,'A1.candidate.events.pentatrodes.compiled')
+if ~does_log_exist(dirs, 'A1.candidate.events.pentatrodes.compiled')
   
   % compile event database
-  CEs = compile_candidate_event_database_for_large_data(dirs,swl);
+  CEs = compile_candidate_event_database_for_large_data(dirs, swl);
   
   % calculate feature space representation for clustering dataset
   % ---------------------------------------------------------------
@@ -191,20 +196,20 @@ if ~does_log_exist(dirs,'A1.candidate.events.pentatrodes.compiled')
   params.use_pentatrodes = true;
   
   % design feature space
-  if ~does_log_exist(dirs,'A1.fsp.generated')
+  if ~does_log_exist(dirs, 'A1.fsp.generated')
     [fsp params] = design_feature_space(CEs, params);
     save_event_file(dirs, fsp, 'feature_space_pentatrodes');
     save_event_file(dirs, params, 'feature_space_params');
-    create_log(dirs,'A1.fsp.generated');
+    create_log(dirs, 'A1.fsp.generated');
   else
-    params = get_event_file(dirs,'feature_space_params');
+    params = get_event_file(dirs, 'feature_space_params');
   end
   
   % remove duplicates from CEs
   CEs = remove_duplicates_from_CEs(CEs, params);
   
   % save CEs
-  save_event_file(dirs,CEs,'candidate_events_pentatrodes');
+  save_event_file(dirs, CEs, 'candidate_events_pentatrodes');
 
   
   % calculate feature space representation for all data
@@ -214,7 +219,7 @@ if ~does_log_exist(dirs,'A1.candidate.events.pentatrodes.compiled')
   p = 0; t2 = clock;
   % run through sweeps
   for ii=1:L(swl)
-    p = print_progress(ii,L(swl),p);
+    p = print_progress(ii, L(swl), p);
     params = try_rmfield(params, {'which_kept'});
     % compile for that sweep
     CEs = compile_candidate_event_database(dirs, swl(ii), 'silent', ...
@@ -233,13 +238,13 @@ if ~does_log_exist(dirs,'A1.candidate.events.pentatrodes.compiled')
   
   
   % done - add to log
-  create_log(dirs,'A1.candidate.events.pentatrodes.compiled');
+  create_log(dirs, 'A1.candidate.events.pentatrodes.compiled');
 
   
 end
 
 fprintf_timediff(t1);
-create_log(dirs,'A1.finished');
+create_log(dirs, 'A1.finished');
 
 
 
@@ -247,11 +252,11 @@ end
 
 
 %% HELPER FUNCTION for parallel
-function sfce(dirs,swlt)
+function sfce(dirs, swlt)
   timestamp = swlt.all_files(1).timestamp;
   candidate_events = find_candidate_events(dirs, swlt);
   shapes = candidate_events.shape;
-  candidate_events = rmfield(candidate_events,'shape');
+  candidate_events = rmfield(candidate_events, 'shape');
   save_sweep_file(dirs, timestamp, candidate_events, 'candidate_events');
   save_sweep_file(dirs, timestamp, shapes, 'shapes');
 end

@@ -16,7 +16,12 @@ function save_sweep_file(dirs, swf, variable_value, variable_name) %#ok<INUSL>
   if isstruct(swf)
     dirs.dest = [dirs.sweeps swf.timestamp '/'];
     mkdir_nowarning(dirs.dest);
-    filename = [dirs.dest variable_name '.' swf.bwvt_source '.mat'];
+    try
+      filename = [dirs.dest variable_name '.' swf.bwvt_source '.mat'];
+    catch
+      filename = [dirs.dest variable_name '.' swf.f32_source '.mat'];
+    end
+    
   elseif ischar(swf)
     dirs.dest = [dirs.sweeps swf '/'];
     mkdir_nowarning(dirs.dest);

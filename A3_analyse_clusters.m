@@ -154,12 +154,12 @@ sp = cell2mat(sp)';
 
 % add length of signal to sweep params
 for ii=1:L(sp)
-  sp(ii).all.names = [sp(ii).all.names; 'length_signal_ms'];
-  sp(ii).all.values = [sp(ii).all.values; round(sp(ii).length_signal_ms)];
+  sp(ii).all.names = [sp(ii).all.names 'length_signal_ms'];
+  sp(ii).all.values = [sp(ii).all.values round(sp(ii).length_signal_ms)];
 end
 
 % which set do they belong to
-[usp junk set_ids] = unique(reach(sp,'all.values')','rows');
+[usp junk set_ids] = unique(reach(sp, 'all.values''')', 'rows');
 for ii=1:L(sp)
   sp(ii).set_id = set_ids(ii);
 end

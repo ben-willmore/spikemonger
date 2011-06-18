@@ -1,7 +1,7 @@
 setpath;
 
-%rootdir = '/shub/experiments/data.expt12/contrast.naive.recluster/';
-rootdir = './todo2/';
+rootdir = '/shub/experiments/data.expt30/';
+%rootdir = './todo2/';
 subdirs = getfilelist(rootdir,'P','prefix');
 
 % fprintf_title('subdirs:');
@@ -9,7 +9,7 @@ subdirs = getfilelist(rootdir,'P','prefix');
 %   fprintf_numbered(subdirs(ii).name, ii, L(subdirs));
 % end
 
-for ii=1:L(subdirs)
+for ii=19:36
 try
   t1 = clock;
   fprintf_numbered(subdirs(ii).name,ii,L(subdirs),'title');

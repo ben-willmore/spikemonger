@@ -11,6 +11,7 @@ end
 % ensure there is a trailing slash
 dirs.root = fixpath(dirs.root);
 dirs.raw_bwvt = [dirs.root 'raw.bwvt/'];
+dirs.raw_f32 = [dirs.root 'raw.f32/'];
 dirs.sweeps = [dirs.root 'sweeps/'];
 dirs.events = [dirs.root 'events/'];
 dirs.logs = [dirs.root 'logs/'];
