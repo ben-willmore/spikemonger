@@ -22,7 +22,8 @@ function directory = pickdir_for_cluster_ui(rootdir)
       % remove invalid directories
       switch dirs(ii).name
         case {'.','lib','old','old.disabled','brainware','events','sweep','sweeps',...
-            '.temp','clusters_no_time','clusters_time','logs','clusters_pentatrodes'}
+            '.temp','clusters_no_time','clusters_time','logs','clusters_pentatrodes', ...
+              'raw.f32', 'regressed.f32'}
           tokeep(ii) = false;
       end
       

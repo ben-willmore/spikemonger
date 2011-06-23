@@ -4,7 +4,8 @@ function convert_benware_f32(dirs, file, sweep)
 % sample rate
 dt = 0.040959999071638; % ms
 fs = 1000/dt;           % Hz
-% ensure this is done
+
+% ensure dirs structure is prepared
 dirs = fix_dirs_struct(dirs);
 
 % does the source file exist?

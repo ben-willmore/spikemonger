@@ -115,11 +115,12 @@ switch todo{1}
     
   case 'P' % special plots
     fprintf_subtitle('special plots');
-    fprintf_bullet(['[c]:  plot for contrast data\n']);    
+    fprintf_bullet('[1]:  STRF for ctuning.drc data\n');    
+    fprintf_bullet('[2]:  STRF for CRF04 data\n');
     fprintf('\n');
     fprintf_bullet(['[0]:  cancel\n']);
     fprintf('\n');
-    todo{2} = demandinput('     >>> ',['c' '0']);
+    todo{2} = demandinput('     >>> ',['0', '1', '2']);
     if isequal(todo{2},'0'), todo = []; return; end
     return;
     

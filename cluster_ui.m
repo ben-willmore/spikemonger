@@ -205,17 +205,10 @@ while continue_loop
       
     case 'P' % special plots
       switch todo{2}
-        case 'c'
-          try
-            if isequal(round(unique([C.data(1).set.length_signal_ms])),[15300 31000])
-              plot_contrast_analysis_2(C.data);
-            else
-              plot_contrast_analysis_v7(C.data);
-            end
-          catch
-            fprintf_subtitle('failed.');
-            pause;
-          end
+        case '1'
+          plot_STRFs_ctuning_drc(C.data);
+        case '2'
+          plot_STRFs_CRF04(C.data);
       end
       
     case 'm' % merge

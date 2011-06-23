@@ -1,17 +1,19 @@
-function spikemonger(rootdir)
+function spikemonger(rootdir, varargin)
 % spikemonger(rootdir)
-%
-% Main wrapper file for running spikemonger over a set of penetrations.
-% Ensure your directory structure is as follows:
-%   .         - spikemonger directory (ie the current directory )
-%   ./data    - where your data is (could be anything you like),
-%   with all the .src/.bwvt files in this rootdir
 
-% ======================
-% SPIKEMONGER v1.0.0.5
-% ======================
-%   - NCR 11-Jun-2010
-%   - distributed under GPL v3 (see COPYING)
+%% parse varargin
+% ================
+
+REGRESSED = false;
+
+try
+  if nargin>1
+    if any(ismember({'regressed'}, varargin))
+      REGRESSED = true;
+    end  
+  end
+catch
+end
 
 
 %% initialise rootdir
@@ -33,13 +35,6 @@ if n.files_in_dir == 0
   error('input:error','no such rootdir');
 end
 
-% does the rootdir have any files
-n.srcfiles  = L(dir([dirs.root '*.src']));
-n.bwvtfiles = L(dir([dirs.root '*.bwvt']));
-if n.srcfiles + n.bwvtfiles == 0
-  %dirs.root = change_main_directory(dirs.root);
-end
-
 % fix
 dirs = fix_dirs_struct(dirs.root);
 
@@ -49,7 +44,13 @@ dirs = fix_dirs_struct(dirs.root);
 
 t0 = clock;
 
-B1_convert_f32s(dirs);
+if REGRESSED
+  B0_f32_regression(dirs);
+  B1_convert_f32s(dirs, 'regressed');
+else
+  B1_convert_f32s(dirs);
+end
+
 A2_autocut_clusters(dirs);
 A3_analyse_clusters(dirs,'clusters_pentatrodes');
 

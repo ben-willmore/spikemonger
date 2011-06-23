@@ -1,13 +1,17 @@
 function B1_convert_f32s(dirs, varargin)
 % B1_convert_f32s(dirs)
 % B1_convert_f32s(root_directory)
+% B1_convert_f32s(..., 'force_redo')
+% B1_convert_f32s(..., 'parallel')
+% B1_convert_f32s(..., 'regressed')
 
 %% parse varargin
 % ================
 
 CAN_USE_PARALLEL = false;
-
 FORCE_REDO = false;
+REGRESSED = false;
+
 try
   if nargin>1
     if any(ismember({'force_redo', 'forceredo', 'FORCE_REDO', ...
@@ -17,6 +21,10 @@ try
     if any(ismember({'parallel', 'can_use_parallel', 'PARALLEL', 'CAN_USE_PARALLEL'}, varargin))
       CAN_USE_PARALLEL = true;
     end
+    if any(ismember({'regressed'}, varargin))
+      REGRESSED = true;
+    end
+    
   end
 catch
 end
@@ -32,7 +40,11 @@ catch
 end
 
 % title
-fprintf_subtitle(['(1) converting f32s']);
+if REGRESSED
+  fprintf_subtitle(['(1) converting f32s from regressed']);
+else
+  fprintf_subtitle(['(1) converting f32s']);
+end
 
 % terminate if A1 has already been finished
 if does_log_exist(dirs, 'A1.finished')
@@ -51,7 +63,11 @@ if does_log_exist(dirs, 'A1.f32s.converted')
 else
   
   % directory contents
-  files = getfilelist(dirs.raw_f32, 'f32');
+  if REGRESSED
+    files = getfilelist(dirs.regressed_f32, 'f32');
+  else
+    files = getfilelist(dirs.raw_f32, 'f32');
+  end
   files = files(~ismember({files.prefix}, {'nothing'}));
   n.files = L(files);
   mkdir_nowarning(dirs.sweeps);
