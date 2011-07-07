@@ -19,6 +19,7 @@ fprintf('\n');
 fprintf_bullet(['[m]:   merge clusters\n']);
 fprintf_bullet(['[d]:   delete a cluster\n']);
 fprintf_bullet(['[c]:   cleave a cluster\n']);
+fprintf_bullet(['[C]:   cleave out a cluster\n']);
 fprintf('\n');
 fprintf_bullet(['[i]:   fix cluster ISIs --  < 1 ms\n']);
 fprintf_bullet(['[I]:   fix cluster ISIs --  50 Hz\n']);
@@ -36,7 +37,7 @@ fprintf('\n');
 fprintf_bullet(['[Q]:   quit\n']);
 fprintf('\n');
 
-todo{1} = demandinput('     >>> ',{'0','1','2','3','m','d','c','i','I','J','s','S','u','!','h','H','Q','k','p','P'});
+todo{1} = demandinput('     >>> ',{'0','1','2','3','m','d','c','C','i','I','J','s','S','u','!','h','H','Q','k','p','P'});
 
 
 % response
@@ -154,6 +155,14 @@ switch todo{1}
     todo{4} = demandnumberinput(['\nKeep until what sweep?  (' n2s(todo{3}) ' - ' n2s(n.sweeps) ')  >>> '], todo{3}:n.sweeps);
     if todo{4}==0, todo = []; return; end    
     
+  case 'C' % cleave out
+    todo{2} = demandnumberinput('\nWhich cluster?  >>> ', 0:n.c);
+    if todo{2}==0, todo = []; return; end
+    todo{3} = demandnumberinput(['\Delete from what sweep?  (1 - ' n2s(n.sweeps) ')  >>> '], 1:n.sweeps);
+    if todo{3}==0, todo = []; return; end
+    todo{4} = demandnumberinput(['\Delete until what sweep?  (' n2s(todo{3}) ' - ' n2s(n.sweeps) ')  >>> '], todo{3}:n.sweeps);
+    if todo{4}==0, todo = []; return; end    
+
   case '!' % start over again
     to_restart = demandinput(['\n\nAre you sure? This will undo everything you have done.\n' ...
                   '        [yes/no]   >>>  '], {'yes','no'});

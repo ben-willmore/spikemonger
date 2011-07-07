@@ -7,7 +7,7 @@ function plot_STRFs_CRF04(data)
 compname = get_current_computer_name;
 switch compname
   case 'macgyver'
-    dirs.grid = '/shub/drc/stimuli/CRF04/grids.mat/';
+    dirs.grid = '/shub/drc/stimuli.CRF04/grids.mat/';
   otherwise
     fprintf('you need to enter into plot_contrast_analysis.m the location of the grid files\n');
     keyboard;

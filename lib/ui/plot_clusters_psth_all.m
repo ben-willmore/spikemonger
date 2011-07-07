@@ -30,7 +30,8 @@ switch get_current_computer_name
   end
 
 % run through different bin widths
-dhs = [2 5 10 25];
+%dhs = [2 5 10 25];
+dhs = [25];
 for cc = 1:n.ctp
   for hh=1:L(dhs);
     dh = dhs(hh);
@@ -38,7 +39,7 @@ for cc = 1:n.ctp
     col = cols(cl,:);
     
     % make axis
-    p.ax(cc,hh) = axn(n.ctp,4,cc,hh,'gapx',0.05,'gapy',0.05,'offset',[0.02 0 0 0.02]);
+    p.ax(cc,hh) = axn(n.ctp,L(dhs),cc,hh,'gapx',0.05,'gapy',0.05,'offset',[0.02 0 0 0.02]);
     
     % plot psth
     tt = psth(cl).(['tt_' n2s(dh) 'ms_bins']);
@@ -59,7 +60,7 @@ for cc = 1:n.ctp
       p.title(hh) = title10bf([n2s(dh) 'ms bins']);
     end
     
-        % sahani variance explained
+    % sahani variance explained
     sves = reach(sve,['percentage_signal.at_' n2s(dh) 'ms']);
     if all(isnan(sves))
       try

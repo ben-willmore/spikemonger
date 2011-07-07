@@ -87,8 +87,23 @@ else
 
   % load metadata
   load([dirs.root 'gridInfo.mat']);
-  load([dirs.root 'sweepInfo.mat']);
 
+  sweep_files = getmatfilelist([dirs.root 'sweep.mat/']);
+  for ii=1:L(sweep_files)
+    sweep_idx = regexprep(sweep_files(ii).name, '^.*sweep.', '');
+    sweep_idx = regexprep(sweep_idx, '.mat', '');
+    sweep_idx = str2double(sweep_idx);
+    sweep_files(ii).sweep_idx = sweep_idx;
+  end
+  [junk sort_idx] = sort([sweep_files.sweep_idx]);
+  sweep_files = sweep_files(sort_idx);
+
+  sweeps = cell(1, L(sweep_files));
+  for ii=1:L(sweeps)
+    swt = load(sweep_files(ii).fullname);
+    sweeps{ii} = swt.sweep;
+  end
+  sweeps = cell2mat(sweeps);
   
   % try using parallel computation
   if CAN_USE_PARALLEL

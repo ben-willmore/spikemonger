@@ -1,6 +1,6 @@
 setpath;
 
-rootdir = '/shub/experiments/data.expt30/';
+rootdir = '/shub/experiments/data.expt31/to.process/';
 %rootdir = './todo2/';
 subdirs = getfilelist(rootdir,'P','prefix');
 
@@ -9,11 +9,12 @@ subdirs = getfilelist(rootdir,'P','prefix');
 %   fprintf_numbered(subdirs(ii).name, ii, L(subdirs));
 % end
 
-for ii=19:36
+for ii=1:L(subdirs)
 try
   t1 = clock;
   fprintf_numbered(subdirs(ii).name,ii,L(subdirs),'title');
-  spikemonger(subdirs(ii).fullname);
+  %B1_convert_f32s(subdirs(ii).fullname);
+  spikemonger(subdirs(ii).fullname);  
   fprintf_subtitle(['finished ' subdirs(ii).name ' successfully:  ' timediff(t1,clock)]);
 catch ME
   if isempty(ME.identifier)
