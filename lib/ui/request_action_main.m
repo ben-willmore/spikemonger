@@ -90,12 +90,13 @@ switch todo{1}
     fprintf_bullet(['[5]:  plot time course\n']);
     fprintf_bullet(['[6]:  plot triggers\n']);
     fprintf('\n');
+    fprintf_bullet(['[7]:  plot fsp separation\n']);
     fprintf_bullet(['[8]:  plot cross-correlogram\n']);
     fprintf('\n');
     fprintf_bullet(['[9]:  plot 2-6\n']);
     fprintf_bullet(['[0]:  cancel\n']);
     fprintf('\n');
-    todo{2} = demandnumberinput('     >>> ',[1:6 0 8 9]);
+    todo{2} = demandnumberinput('     >>> ',[1:6 0 7 8 9]);
     if todo{2}==0, todo = []; return; end
     still_available = 0:n.c;
     todo{3} = demandnumberinput('\nWhich cluster 1?  >>> ', [still_available 99]);
@@ -154,7 +155,7 @@ switch todo{1}
     if todo{3}==0, todo = []; return; end
     todo{4} = demandnumberinput(['\nKeep until what sweep?  (' n2s(todo{3}) ' - ' n2s(n.sweeps) ')  >>> '], todo{3}:n.sweeps);
     if todo{4}==0, todo = []; return; end    
-    
+
   case 'C' % cleave out
     todo{2} = demandnumberinput('\nWhich cluster?  >>> ', 0:n.c);
     if todo{2}==0, todo = []; return; end
@@ -162,7 +163,7 @@ switch todo{1}
     if todo{3}==0, todo = []; return; end
     todo{4} = demandnumberinput(['\Delete until what sweep?  (' n2s(todo{3}) ' - ' n2s(n.sweeps) ')  >>> '], todo{3}:n.sweeps);
     if todo{4}==0, todo = []; return; end    
-
+    
   case '!' % start over again
     to_restart = demandinput(['\n\nAre you sure? This will undo everything you have done.\n' ...
                   '        [yes/no]   >>>  '], {'yes','no'});

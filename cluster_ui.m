@@ -3,7 +3,7 @@ setpath;
 % rootdir, based on source computer
 compname = get_current_computer_name;
 if strcmp(compname, 'macgyver');
-  rootdir = '/shub/experiments/data.expt31/CRF04/';
+  rootdir = '/shub/experiments/data.expt32/CRF04/';
 elseif strcmp(compname, 'blueweasel');
   rootdir = 'data/';
 elseif strcmp(compname, 'welshcob');
@@ -192,7 +192,7 @@ while continue_loop
         case 6
           p = plot_clusters_trigger(C.trigger, cols, ctp, n);
         case 7
-          p = plot_clusters_raster(C.data, cols, ctp);
+          p = plot_clusters_fsp_separation(C.fsp, cols, ctp);
         case 8
           p = plot_clusters_ccg(C.data, C.acgs, cols, ctp);
         case 9

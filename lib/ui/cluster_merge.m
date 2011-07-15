@@ -22,8 +22,8 @@ function C = cluster_merge(C,ids)
   for ii=2:n.ids
     fsp = [fsp; C.fsp{ids(ii)}];
   end
-  tokeep = head(randperm(size(fsp,1)),MAX_N_FSP);
-  fsp = fsp(tokeep,:,:);
+  %tokeep = head(randperm(size(fsp,1)),MAX_N_FSP);
+  %fsp = fsp(tokeep,:,:);
     
   % eg shapes
   sh = C.sh{ids(1)};
