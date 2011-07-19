@@ -13,7 +13,7 @@ for ii=1:L(subdirs)
 try
   t1 = clock;
   fprintf_numbered(subdirs(ii).name,ii,L(subdirs),'title');
-  %B1_convert_f32s(subdirs(ii).fullname);
+  %A1_convert_f32s(subdirs(ii).fullname);
   spikemonger(subdirs(ii).fullname);  
   fprintf_subtitle(['finished ' subdirs(ii).name ' successfully:  ' timediff(t1,clock)]);
 catch ME

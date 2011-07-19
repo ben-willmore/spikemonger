@@ -1,9 +1,9 @@
-function B1_convert_f32s(dirs, varargin)
-% B1_convert_f32s(dirs)
-% B1_convert_f32s(root_directory)
-% B1_convert_f32s(..., 'force_redo')
-% B1_convert_f32s(..., 'parallel')
-% B1_convert_f32s(..., 'regressed')
+function A1_convert_f32s(dirs, varargin)
+% A1_convert_f32s(dirs)
+% A1_convert_f32s(root_directory)
+% A1_convert_f32s(..., 'force_redo')
+% A1_convert_f32s(..., 'parallel')
+% A1_convert_f32s(..., 'regressed')
 
 %% parse varargin
 % ================

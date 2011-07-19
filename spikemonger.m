@@ -46,9 +46,9 @@ t0 = clock;
 
 if REGRESSED
   B0_f32_regression(dirs);
-  B1_convert_f32s(dirs, 'regressed');
+  A1_convert_f32s(dirs, 'regressed');
 else
-  B1_convert_f32s(dirs);
+  A1_convert_f32s(dirs);
 end
 
 A2_autocut_clusters(dirs);
