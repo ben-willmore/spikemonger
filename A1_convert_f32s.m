@@ -40,11 +40,7 @@ catch
 end
 
 % title
-if REGRESSED
-  fprintf_subtitle(['(1) converting f32s from regressed']);
-else
-  fprintf_subtitle(['(1) converting f32s']);
-end
+fprintf_subtitle(['(1) converting f32s']);
 
 % terminate if A1 has already been finished
 if does_log_exist(dirs, 'A1.finished')
@@ -148,6 +144,65 @@ else
 end
 fprintf('[ok]\n');
 
+
+%% regression
+% ===============
+
+if REGRESSED  
+  
+  fprintf_subtitle('Regressing');
+  
+  if does_log_exist(dirs, 'A1.postregressed')
+    fprintf_bullet('already done.\n');
+    
+  else
+    
+    for ss = 1:L(swl)
+      fprintf('sweep %d/%d\n', ss, L(swl));
+      signals = cell(1, 16);
+      
+      % load signals
+      for ii=1:16
+        filename = swl(ss).by_type.filtered_signal(ii).fullname;
+        tmp = load(filename);
+        try
+          signals{ii} = tmp.filtered_signal;
+        catch
+          signals{ii} = tmp.sig;
+        end
+      end
+      signals = cell2mat(signals);
+      
+      
+      % collect signals
+      n.samples = size(signals, 1);
+      n.reg_samples = round(n.samples/10);
+      
+      regressed_signals = zeros(size(signals));
+      
+      % regress outside the pentatrode, using random subset
+      for ii=1:16
+        tok = randsample(n.samples, n.reg_samples);
+        y = signals(tok, ii);
+        jj = setdiff(1:16, ii+(-2:2));
+        x = [signals(tok, jj), ones(n.reg_samples,1)];
+        b = regress(y,x);
+        % correct the f32
+        regressed_signals(:, ii) = signals(:,ii) - [signals(:, jj), ones(n.samples,1)] * b;
+      end
+      
+      % save signals
+      for ii=1:16
+        filename = swl(ss).by_type.filtered_signal(ii).fullname;
+        sig = regressed_signals(:, ii);
+        save(filename, 'sig', '-v6');
+      end
+    end
+    
+    % report that it is finished in the log
+    create_log(dirs, 'A1.postregressed');
+  end
+end
 
 
 %% detect candidate events
