@@ -45,7 +45,6 @@ dirs = fix_dirs_struct(dirs.root);
 t0 = clock;
 
 if REGRESSED
-  B0_f32_regression(dirs);
   A1_convert_f32s(dirs, 'regressed');
 else
   A1_convert_f32s(dirs);

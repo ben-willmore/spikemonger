@@ -1,8 +1,9 @@
 setpath;
 
-rootdir = '/shub/experiments/data.expt31/to.process/';
+rootdir = '/shub/experiments/data.expt33/split/';
 %rootdir = './todo2/';
-subdirs = getfilelist(rootdir,'P','prefix');
+subdirs = [getfilelist(rootdir, 'P07', 'prefix')];
+
 
 % fprintf_title('subdirs:');
 % for ii=1:L(subdirs)

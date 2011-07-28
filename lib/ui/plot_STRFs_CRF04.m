@@ -23,6 +23,11 @@ for aa=1:L(data)
   
   datat = data(aa).set;
   
+  % is this SHEnC data?
+  if ismember('Source', fieldnames(datat(1).stim_params))
+    datat = datat([reach(datat, 'stim_params.Source') == 0]);
+  end
+  
   % load grids
   for ii=1:L(datat)
     mode = datat(ii).stim_params.Mode;
@@ -46,11 +51,12 @@ for aa=1:L(data)
   % --------------------
   
   % histogram
-  tt = (0:0.025:38)*1000 + 10;
+  tt = (0:0.025:38)*1000 + 4;
   n.blocks = 1500;
   tokeep_num = 81:1376;
   tokeep_prediction_num = 1377:1519;
   
+
   for ii=1:L(datat)
     t = datat(ii).spikes.t;
     h = droptail(histc(t, tt));

@@ -63,11 +63,7 @@ if does_log_exist(dirs, 'A1.f32s.converted')
 else
   
   % directory contents
-  if REGRESSED
-    files = getfilelist(dirs.regressed_f32, 'f32');
-  else
-    files = getfilelist(dirs.raw_f32, 'f32');
-  end
+  files = getfilelist(dirs.raw_f32, 'f32');
   files = files(~ismember({files.prefix}, {'nothing'}));
   n.files = L(files);
   mkdir_nowarning(dirs.sweeps);
