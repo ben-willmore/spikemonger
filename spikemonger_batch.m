@@ -1,8 +1,8 @@
 setpath;
 
-rootdir = '/shub/experiments/data.expt33/split/';
+rootdir = '/shub/experiments/data.expt34/split/';
 %rootdir = './todo2/';
-subdirs = [getfilelist(rootdir, 'P07', 'prefix')];
+subdirs = [getfilelist(rootdir, 'P', 'prefix')];
 
 
 % fprintf_title('subdirs:');
@@ -11,12 +11,13 @@ subdirs = [getfilelist(rootdir, 'P07', 'prefix')];
 % end
 
 for ii=1:L(subdirs)
-try
+%try
   t1 = clock;
   fprintf_numbered(subdirs(ii).name,ii,L(subdirs),'title');
   %A1_convert_f32s(subdirs(ii).fullname);
   spikemonger(subdirs(ii).fullname);  
   fprintf_subtitle(['finished ' subdirs(ii).name ' successfully:  ' timediff(t1,clock)]);
+%{
 catch ME
   if isempty(ME.identifier)
     rethrow(ME);
@@ -28,4 +29,5 @@ catch ME
 		  '.mat\n'],2);
   save(['error.' subdirs(ii).name '.mat'],'ME','-v6');
 end
+%}
 end 
