@@ -63,13 +63,11 @@ else
     fprintf('Found BWVT files.\n');
     source_dir = dirs.raw_bwvt;
     source_ext = 'bwvt';
-    convert_func = @convert_bwvt;
     
   elseif exist(dirs.raw_f32, 'dir')
     fprintf('Found .f32 files.\n');
     source_dir = dirs.raw_f32;
     source_ext = 'f32';
-    convert_func = @convert_benware_f32;
     
   else
     error(sprintf('Could not find data directory (%s or %s)', ...
@@ -95,41 +93,44 @@ else
     files(ii).channel_idx = channel_idx;
   end
 
-  % load metadata
-  load([dirs.root 'gridInfo.mat']);
+  % load metadata (only for f32s)
+  if strcmp(source_ext, 'f32')
+    load([dirs.root 'gridInfo.mat']);
 
-  sweep_files = getmatfilelist([dirs.root 'sweep.mat/']);
-  for ii=1:L(sweep_files)
-    sweep_idx = regexprep(sweep_files(ii).name, '^.*sweep.', '');
-    sweep_idx = regexprep(sweep_idx, '.mat', '');
-    sweep_idx = str2double(sweep_idx);
-    sweep_files(ii).sweep_idx = sweep_idx;
-  end
-  [junk sort_idx] = sort([sweep_files.sweep_idx]);
-  sweep_files = sweep_files(sort_idx);
-
-  sweeps = cell(1, L(sweep_files));
-  for ii=1:L(sweeps)
-    swt = load(sweep_files(ii).fullname);
-    sweeps{ii} = swt.sweep;
-  end
-  sweeps = cell2mat(sweeps);
-  
-  % try using parallel computation
-  if CAN_USE_PARALLEL
-    fprintf(['converting data files (parallel):    [' n2s(n.files) ' files]:\n\n']);
-    parfor ii=1:n.files
-      convert_func(dirs, files(ii), ii, n.files); %#ok<*PFBNS>
+    sweep_files = getmatfilelist([dirs.root 'sweep.mat/']);
+    for ii=1:L(sweep_files)
+      sweep_idx = regexprep(sweep_files(ii).name, '^.*sweep.', '');
+      sweep_idx = regexprep(sweep_idx, '.mat', '');
+      sweep_idx = str2double(sweep_idx);
+      sweep_files(ii).sweep_idx = sweep_idx;
     end
-    
-    % if no parallel computation available
-  else
-    fprintf('converting data files (non-parallel):\n\n');
-    for ii=1:n.files
-      file = files(ii);
+    [junk sort_idx] = sort([sweep_files.sweep_idx]);
+    sweep_files = sweep_files(sort_idx);
+
+    sweeps = cell(1, L(sweep_files));
+    for ii=1:L(sweeps)
+      swt = load(sweep_files(ii).fullname);
+      sweeps{ii} = swt.sweep;
+    end
+    sweeps = cell2mat(sweeps);
+  
+  end
+  
+  fprintf('converting data files:\n\n');
+  for ii=1:n.files
+    file = files(ii);
+    fprintf_numbered(file.name, ii, n.files);
+
+    if strcmp(source_ext, 'bwvt')
+      convert_bwvt(dirs, file, ii, n.files);
+
+    elseif strcmp(source_ext, 'f32')
       sweep = sweeps(file.sweep_idx);
-      fprintf_numbered(file.name, ii, n.files);
-      convert_func(dirs, file, sweep)
+      convert_benware_f32(dirs, file, sweep);
+
+    else
+      error('Unknown file type');
+
     end
   end
   

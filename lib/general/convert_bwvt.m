@@ -109,11 +109,13 @@ for ii=1:L(bwvt)
   fields = sweep_params.all.names;
   for ff=1:L(fields)
     sweep_params.(fields{ff}) = sweep_params.all.values(ff);
-  end  
+  end
   sweep_params.length_signal_smp = L(bwvt(ii).signal);
   sweep_params.length_signal_ms  = L(bwvt(ii).signal) * dt;
+  sweep_params.all.values = sweep_params.all.values';
+  sweep_params.all.names = sweep_params.all.names';
   save_sweep_file(dirs, swf, sweep_params, 'sweep_params');
-
+  
   % filtered signal
   filtered_signal = bandpass_for_spikes(bwvt(ii).signal,fs);
   save_sweep_file(dirs, swf, filtered_signal, 'filtered_signal');
