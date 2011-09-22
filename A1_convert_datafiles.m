@@ -1,4 +1,4 @@
-function A1_convert_f32s(dirs, varargin)
+function A1_convert_datafiles(dirs, varargin)
 % A1_convert_f32s(dirs)
 % A1_convert_f32s(root_directory)
 % A1_convert_f32s(..., 'force_redo')
@@ -40,7 +40,7 @@ catch
 end
 
 % title
-fprintf_subtitle(['(1) converting f32s']);
+fprintf_subtitle(['(1) converting data files']);
 
 % terminate if A1 has already been finished
 if does_log_exist(dirs, 'A1.finished')
@@ -49,17 +49,35 @@ if does_log_exist(dirs, 'A1.finished')
 end
 
 
-%% convert the f32s
+%% convert the data files
 % =====================
 
-if does_log_exist(dirs, 'A1.f32s.converted')
-  fprintf('f32s already converted.\n');
+if does_log_exist(dirs, 'A1.datafiles.converted')
+  fprintf('Data files already converted.\n');
   
   
 else
   
-  % directory contents
-  files = getfilelist(dirs.raw_f32, 'f32');
+  % determine data type
+  if exist(dirs.raw_bwvt, 'dir')
+    fprintf('Found BWVT files.\n');
+    source_dir = dirs.raw_bwvt;
+    source_ext = 'bwvt';
+    convert_func = @convert_bwvt;
+    
+  elseif exist(dirs.raw_f32, 'dir')
+    fprintf('Found .f32 files.\n');
+    source_dir = dirs.raw_f32;
+    source_ext = 'f32';
+    convert_func = @convert_benware_f32;
+    
+  else
+    error(sprintf('Could not find data directory (%s or %s)', ...
+      dirs.raw_bwvt, dirs.raw_f32));
+  end
+
+  % directory contents  
+  files = getfilelist(source_dir, source_ext);
   files = files(~ismember({files.prefix}, {'nothing'}));
   n.files = L(files);
   mkdir_nowarning(dirs.sweeps);
@@ -72,7 +90,7 @@ else
     files(ii).sweep_idx = sweep_idx;
 
     channel_idx = regexprep(files(ii).name, '^.*channel.', '');
-    channel_idx = regexprep(channel_idx, '.f32', '');
+    channel_idx = regexprep(channel_idx, source_ext, '');
     channel_idx = str2double(channel_idx);
     files(ii).channel_idx = channel_idx;
   end
@@ -99,24 +117,24 @@ else
   
   % try using parallel computation
   if CAN_USE_PARALLEL
-    fprintf(['converting f32s (parallel):    [' n2s(n.files) ' files]:\n\n']);
+    fprintf(['converting data files (parallel):    [' n2s(n.files) ' files]:\n\n']);
     parfor ii=1:n.files
-      convert_benware_f32(dirs, files(ii), ii, n.files); %#ok<*PFBNS>
+      convert_func(dirs, files(ii), ii, n.files); %#ok<*PFBNS>
     end
     
     % if no parallel computation available
   else
-    fprintf('converting f32s (non-parallel):\n\n');
+    fprintf('converting data files (non-parallel):\n\n');
     for ii=1:n.files
       file = files(ii);
       sweep = sweeps(file.sweep_idx);
       fprintf_numbered(file.name, ii, n.files);
-      convert_benware_f32(dirs, file, sweep)
+      convert_func(dirs, file, sweep)
     end
   end
   
   % write to log
-  create_log(dirs, 'A1.f32s.converted');
+  create_log(dirs, 'A1.datafiles.converted');
   
 end
 

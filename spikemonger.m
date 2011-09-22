@@ -45,9 +45,9 @@ dirs = fix_dirs_struct(dirs.root);
 t0 = clock;
 
 if REGRESSED
-  A1_convert_f32s(dirs, 'regressed');
+  A1_convert_datafiles(dirs, 'regressed');
 else
-  A1_convert_f32s(dirs);
+  A1_convert_datafiles(dirs);
 end
 
 A2_autocut_clusters(dirs);
