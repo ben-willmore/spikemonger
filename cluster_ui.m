@@ -1,15 +1,19 @@
+function cluster_ui(rootdir)
+
 setpath;
 
-% rootdir, based on source computer
-compname = get_current_computer_name;
-if strcmp(compname, 'macgyver');
-  rootdir = '/shub/experiments/data.expt34/split/';
-elseif strcmp(compname, 'blueweasel');
-  rootdir = 'data/';
-elseif strcmp(compname, 'welshcob');
-    rootdir = 'sandra/';    
-elseif strcmp(compname, 'chai');
-    rootdir = '/wocka/resorting/';
+if ~exist('rootdir', 'var')
+    % rootdir, based on source computer
+    compname = get_current_computer_name;
+    if strcmp(compname, 'macgyver');
+      rootdir = '/shub/experiments/data.expt34/split/';
+    elseif strcmp(compname, 'blueweasel');
+      rootdir = 'data/';
+    elseif strcmp(compname, 'welshcob');
+        rootdir = 'sandra/';    
+    elseif strcmp(compname, 'chai');
+        rootdir = '/wocka/resorting/';
+    end
 end
 
 % use the file browser
