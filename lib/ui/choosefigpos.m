@@ -1,6 +1,11 @@
 function pos = choosefigpos(num)
   % choose a position for spikemonger figure
-  
+  % 1 = waveforms
+  % 2 = PSTHes
+  % 3 = ISIs
+  % 4 = Events over time
+  % 5 = Triggers
+
   % proportion of total width to devote to each window
   xprop = [3/8 1/8 1/6 1/6 1/6];
   
@@ -50,6 +55,6 @@ function pos = choosefigpos(num)
 
   end
   
-  pos = [xpos ypos xwid ywid]
-  %keyboard
+  pos = [xpos ypos xwid ywid];
+
   
