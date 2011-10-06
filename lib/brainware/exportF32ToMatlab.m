@@ -9,12 +9,12 @@ function exportf32Tomatlab(sourcepath, destpath)
 
 
 
-% ensure the pathectories ends with a "/"
-    if ~strcmp(sourcepath(end),'/')
-        sourcepath = [sourcepath '/'];
+% ensure the pathectories ends with filesep
+    if ~strcmp(sourcepath(end), filesep)
+        sourcepath = [sourcepath filesep];
     end
-    if ~strcmp(destpath(end),'/')
-        destpath = [destpath '/'];
+    if ~strcmp(destpath(end), filesep)
+        destpath = [destpath filesep];
     end
 
 % run through all files    

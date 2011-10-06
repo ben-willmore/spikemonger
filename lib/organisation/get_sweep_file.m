@@ -19,7 +19,7 @@ function data = get_sweep_file(varargin)
       try
         data = load(swf.fullname);
       catch
-        filename = [dirs.sweeps swf.timestamp '/' swf.type '.' swf.bwvt_source '.mat'];
+        filename = [dirs.sweeps swf.timestamp filesep swf.type '.' swf.bwvt_source '.mat'];
         data = load(swf.fullname);
       end
       
@@ -30,11 +30,11 @@ function data = get_sweep_file(varargin)
 
       try
         swf  = varargin{2};
-        filename = [dirs.sweeps swf.timestamp '/' type '.' swf.bwvt_source '.mat'];
+        filename = [dirs.sweeps swf.timestamp filesep type '.' swf.bwvt_source '.mat'];
         data = load(filename);
       catch
         timestamp = varargin{2};
-        filename = [dirs.sweeps timestamp '/' type '.mat'];
+        filename = [dirs.sweeps timestamp filesep type '.mat'];
         data = load(filename);
       end
       
@@ -44,7 +44,7 @@ function data = get_sweep_file(varargin)
       timestamp   = varargin{2};
       bwvt_source = varargin{3};
       type        = varargin{4};      
-      filename = [dirs.sweeps timestamp '/' type '.' bwvt_source '.mat'];
+      filename = [dirs.sweeps timestamp filesep type '.' bwvt_source '.mat'];
       data = load(filename);
   
       

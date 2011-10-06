@@ -1,6 +1,6 @@
 setpath;
 
-rootdir = '/shub/experiments/data.expt34/split/';
+rootdir = '../P07-quning.2';
 %rootdir = './todo2/';
 subdirs = [getfilelist(rootdir, 'P', 'prefix')];
 

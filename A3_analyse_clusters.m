@@ -59,7 +59,7 @@ end
 CEs = cell2mat(CEs);
 
 % prepare target dir
-dirs.cluster = [dirs.root cluster_type '/'];
+dirs.cluster = [dirs.root cluster_type filesep];
 mkdir_nowarning(dirs.cluster);
 fprintf_timediff(t1);
 

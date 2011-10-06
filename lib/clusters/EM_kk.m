@@ -30,11 +30,11 @@ end
 % write source data
 randstr = n2s(round(rand*1e8));
 mkdir_nowarning('.temp');
-filename = ['.temp/X_' randstr '.fet.1'];
+filename = ['.temp' filesep 'X_' randstr '.fet.1'];
 fid = fopen(filename,'w');
 fprintf(fid,'%s\n',n2s(D));
 fclose(fid);
-save(['.temp/X_' randstr '.fet.1'],'X','-ASCII','-append');
+save(['.temp' filesep 'X_' randstr '.fet.1'],'X','-ASCII','-append');
 
 % use a subset?
 if size(X,1) > 50e3
@@ -49,9 +49,9 @@ if ispc
 else
   suffix = '';
 end
-
-executable = ['lib/klustakwik/' computer '/KlustaKwik' suffix];
-system([executable ' ./.temp/X_' randstr ' 1' ...
+keyboard;
+executable = ['.' filesep 'lib' filesep 'klustakwik' filesep computer filesep 'KlustaKwik' suffix];
+system([executable ' .' filesep '.temp' filesep 'X_' randstr ' 1' ...
           ' -UseFeatures ' repmat('1',1,D) ...          
           ' -Subset ' n2s(subset_size) ...
           ' -MaxClusters 24' ...
@@ -62,7 +62,7 @@ system([executable ' ./.temp/X_' randstr ' 1' ...
 % ======================
 
 % read
-fid = fopen(['.temp/X_' randstr '.clu.1'],'rt');
+fid = fopen(['.temp' filesep 'X_' randstr '.clu.1'],'rt');
 C = textscan(fid,'%s','bufsize',1e6); C = C{1};
 fclose(fid);
 
@@ -77,7 +77,7 @@ C = C(2:end);
 if false %subset_size==1
   try
     % read
-    fid = fopen(['.temp/X_' randstr '.param.1'],'rt');
+    fid = fopen(['.temp' filesep 'X_' randstr '.param.1'],'rt');
     P = textscan(fid,'%s','bufsize',1e6); P = P{1};
     fclose(fid);
     
@@ -193,4 +193,4 @@ clusters.M = M;
 clusters.V = V;
 
 % delete temp files
-delete(['.temp/X_' randstr '*']);
+delete(['.temp' filesep 'X_' randstr '*']);

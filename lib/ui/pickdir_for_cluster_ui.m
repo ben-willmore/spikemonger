@@ -4,7 +4,7 @@ function directory = pickdir_for_cluster_ui(rootdir)
   % UI for picking a directory
 
   % parse input
-    if nargin==0, rootdir=[pwd '/'];
+    if nargin==0, rootdir=[pwd filesep];
     else rootdir = fixpath(rootdir);
     end
 
@@ -17,7 +17,7 @@ function directory = pickdir_for_cluster_ui(rootdir)
     for ii=1:L(dirs)
       
       % full name
-      dirs(ii).fullname = [rootdir dirs(ii).name '/'];
+      dirs(ii).fullname = [rootdir dirs(ii).name filesep];
       
       % remove invalid directories
       switch dirs(ii).name
@@ -81,7 +81,7 @@ end
         directory = rootdir;
         return;
       otherwise
-        directory = pickdir_for_cluster_ui([rootdir dirs(todo).name '/']);
+        directory = pickdir_for_cluster_ui([rootdir dirs(todo).name filesep]);
         return;
     end
     

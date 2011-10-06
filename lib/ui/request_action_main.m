@@ -5,7 +5,7 @@ todo = {};
 
 % title
 clc;
-fprintf_title(['[' n2s(n.c) ' clusters]  from  ' dirs.root]);
+fprintf_title(['[' n2s(n.c) ' clusters]  from  ' escape_slash(dirs.root)]);
 
 % options
 fprintf_bullet(['[0]:   close all plots\n']);

@@ -97,7 +97,7 @@ else
   if strcmp(source_ext, 'f32')
     load([dirs.root 'gridInfo.mat']);
 
-    sweep_files = getmatfilelist([dirs.root 'sweep.mat/']);
+    sweep_files = getmatfilelist([dirs.root 'sweep.mat' filesep]);
     for ii=1:L(sweep_files)
       sweep_idx = regexprep(sweep_files(ii).name, '^.*sweep.', '');
       sweep_idx = regexprep(sweep_idx, '.mat', '');
@@ -177,7 +177,7 @@ if REGRESSED
   else
     
     for ss = 1:L(swl)
-      fprintf('sweep %d/%d\n', ss, L(swl));
+      fprintf(['sweep %d' filesep '%d\n'], ss, L(swl));
       signals = cell(1, 16);
       
       % load signals

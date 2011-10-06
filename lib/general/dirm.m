@@ -3,7 +3,7 @@ function dirm(path)
   % dirm(path)
   
   if nargin==0
-    path = [pwd '/'];
+    path = [pwd filesep];
   else
     path = fixpath(path);
   end

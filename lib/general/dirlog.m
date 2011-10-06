@@ -3,7 +3,7 @@ function dirlog(path,ext)
   % dirlog(path)
   
   if nargin==0
-    path = [pwd '/'];
+    path = [pwd filesep];
   else
     path = fixpath(path);
   end

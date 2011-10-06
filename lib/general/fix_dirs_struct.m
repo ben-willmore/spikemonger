@@ -10,12 +10,12 @@ end
 
 % ensure there is a trailing slash
 dirs.root = fixpath(dirs.root);
-dirs.raw_bwvt = [dirs.root 'raw.bwvt/'];
-dirs.raw_f32 = [dirs.root 'raw.f32/'];
-dirs.regressed_f32 = [dirs.root 'regressed.f32/'];
-dirs.sweeps = [dirs.root 'sweeps/'];
-dirs.events = [dirs.root 'events/'];
-dirs.logs = [dirs.root 'logs/'];
+dirs.raw_bwvt = [dirs.root 'raw.bwvt' filesep];
+dirs.raw_f32 = [dirs.root 'raw.f32' filesep];
+dirs.regressed_f32 = [dirs.root 'regressed.f32' filesep];
+dirs.sweeps = [dirs.root 'sweeps' filesep];
+dirs.events = [dirs.root 'events' filesep];
+dirs.logs = [dirs.root 'logs' filesep];
 
 %mkdir_nowarning(dirs.sweeps);
 mkdir_nowarning(dirs.events);

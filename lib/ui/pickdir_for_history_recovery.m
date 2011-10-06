@@ -4,10 +4,10 @@ function history = pickdir_for_history_recovery(dirs)
 % which pastdirs can we find
 pastdirs = getfilelist(dirs.root,'clusters.','prefix');
 for ii=1:L(pastdirs)
-  pastdirs(ii).history_fullname = [pastdirs(ii).fullname '/history.mat'];
+  pastdirs(ii).history_fullname = [pastdirs(ii).fullname filesep 'history.mat'];
   pastdirs(ii).is_history_there = L(dir(pastdirs(ii).history_fullname))>0;
-  pastdirs(ii).n_clusters = L(dir([pastdirs(ii).fullname '/cluster.*data.mat']));
-  pastdirs(ii).is_current_cluster = isequal(pastdirs(ii).name, fliplr(get_prefix(drophead(fliplr(dirs.cluster_dest)),'/')));  
+  pastdirs(ii).n_clusters = L(dir([pastdirs(ii).fullname filesep 'cluster.*data.mat']));
+  pastdirs(ii).is_current_cluster = isequal(pastdirs(ii).name, fliplr(get_prefix(drophead(fliplr(dirs.cluster_dest)), filesep)));  
 end
 pastdirs = pastdirs(~[pastdirs.is_current_cluster] & [pastdirs.is_history_there]);
 

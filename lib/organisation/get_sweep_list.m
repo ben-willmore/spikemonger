@@ -10,7 +10,7 @@ function swl = get_sweep_list(dirs)
     swl(ii).timestamp = ts(ii).name;
     
     % all files 
-    f = getmatfilelist([dirs.sweeps swl(ii).timestamp '/']);
+    f = getmatfilelist([dirs.sweeps swl(ii).timestamp filesep]);
     for jj=1:L(f)
       fn = f(jj).name;
       f(jj).type = get_prefix(fn);      

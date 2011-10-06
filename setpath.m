@@ -1,2 +1,2 @@
-path(genpath([pwd '/lib']),path);
-rmpath([pwd '/lib/v0/']);
+path(genpath([pwd filesep 'lib']),path);
+rmpath([pwd filesep 'lib' filesep 'v0' filesep]);

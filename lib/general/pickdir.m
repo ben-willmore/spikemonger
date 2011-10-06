@@ -4,7 +4,7 @@ function directory = pickdir(rootdir)
   % UI for picking a directory
 
   % parse input
-    if nargin==0, rootdir=[pwd '/'];
+    if nargin==0, rootdir=[pwd filesep];
     else rootdir = fixpath(rootdir);
     end
 
@@ -45,7 +45,7 @@ function directory = pickdir(rootdir)
         directory = rootdir;
         return;
       otherwise
-        directory = pickdir([rootdir dirs(todo).name '/']);
+        directory = pickdir([rootdir dirs(todo).name filesep]);
         return;
     end
     

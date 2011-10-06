@@ -10,7 +10,8 @@ You can get it using 'git' (a version control system) or by just downloading a
 = Machine
 
 Spikemonger needs a beefy machine with lots of RAM (8GB) and lots of disk 
-space (budget 3x the amount of space consumed by your raw data).
+space (budget 3x the amount of space consumed by your raw data). You also 
+need a vaguely recent version of Matlab.
 
 
 = Data files
@@ -25,7 +26,8 @@ or
 
 <experiment_name>/<subdirectory>/raw.bwvt/<prefix>.N.bwvt
 
-where <experiment_name>, <subdirectory> and <prefix> can be whatever you like.
+where <experiment_name>, <subdirectory> can be whatever you like; <prefix> 
+should start with 'P'.
 
 All files that should be clustered together should be in the same directory. 
 Spikemonger will assume that consecutively numbered files are from 
@@ -39,4 +41,21 @@ F1002/P02.whitenoise.L/raw.f32/P02.whitenoise.2.f32
 F1002/P02.whitenoise.R/raw.f32/P02.whitenoise.17.f32
 F1002/P02.whitenoise.R/raw.f32/P02.whitenoise.18.f32
 ...
+
+
+= Running spikemonger
+
+There are two stages: automated clustering, and manual cluster cutting. 
+Normally, you will want to set the automated clustering running overnight on
+all your data, and then return when it is done to cluster cut all the data.
+
+* Automated clustering:
+
+-- spikemonger_batch
+-- edit the root_dir line at the start, then run spikemonger_batch
+
+* Cluster cutting:
+
+-- cluster_ui
+platform
 

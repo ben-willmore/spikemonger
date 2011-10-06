@@ -19,11 +19,11 @@ end
 % use the file browser
 sourcedir = pickdir_for_cluster_ui(rootdir);
 dirs = fix_dirs_struct(sourcedir);
-dirs.cluster = [dirs.root 'clusters_pentatrodes/'];
+dirs.cluster = [dirs.root 'clusters_pentatrodes' filesep];
 
 % source and destination paths
 dirs.cluster_source = dirs.cluster;
-dirs.cluster_dest   = [dirs.root 'clusters.' datestr(now, 'yyyy-mm-dd.HHMM') '/'];
+dirs.cluster_dest   = [dirs.root 'clusters.' datestr(now, 'yyyy-mm-dd.HHMM') filesep];
 mkdir_nowarning(dirs.cluster_dest);
 
 
@@ -274,7 +274,7 @@ while continue_loop
       pause(2); pause;      
       
     case 'H' % repeat history
-      dirs.cluster_dest = [dirs.root 'clusters.' datestr(now, 'yyyy-mm-dd.HHMM') '/'];
+      dirs.cluster_dest = [dirs.root 'clusters.' datestr(now, 'yyyy-mm-dd.HHMM') filesep];
       mkdir_nowarning(dirs.cluster_dest);
       C = cluster_repeat_history(C_init, todo{2}, dirs, cols);
       history = update_history(todo{2}, {'h'}, dirs);
@@ -288,4 +288,4 @@ while continue_loop
   end
 end
     
-fprintf_title(['clusters saved in: ' dirs.cluster_dest]);
+fprintf_title(['clusters saved in: ' escape_slash(dirs.cluster_dest)]);
