@@ -1,0 +1,42 @@
+== Spikemonger
+
+= Getting spikemonger
+
+Spikemonger is available from https://github.com/beniamino38/spikemonger .
+You can get it using 'git' (a version control system) or by just downloading a
+.zip/.tar.gz file ('Downloads' link).
+
+
+= Machine
+
+Spikemonger needs a beefy machine with lots of RAM (8GB) and lots of disk 
+space (budget 3x the amount of space consumed by your raw data).
+
+
+= Data files
+
+Spikemonger works on .bwvt files (produced by BrainWare) or .f32 files 
+(produced by BenWare). You will need to organise your data files into the 
+structure expected by spikemonger:
+
+<experiment_name>/<subdirectory>/raw.f32/<prefix>.N.f32
+
+or
+
+<experiment_name>/<subdirectory>/raw.bwvt/<prefix>.N.bwvt
+
+where <experiment_name>, <subdirectory> and <prefix> can be whatever you like.
+
+All files that should be clustered together should be in the same directory. 
+Spikemonger will assume that consecutively numbered files are from 
+neighbouring sites.
+
+For example, for a bilateral recording, you want:
+
+F1002/P02.whitenoise.L/raw.f32/P02.whitenoise.1.f32
+F1002/P02.whitenoise.L/raw.f32/P02.whitenoise.2.f32
+...
+F1002/P02.whitenoise.R/raw.f32/P02.whitenoise.17.f32
+F1002/P02.whitenoise.R/raw.f32/P02.whitenoise.18.f32
+...
+
