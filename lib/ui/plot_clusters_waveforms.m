@@ -26,14 +26,9 @@ switch get_current_computer_name
     set(p.fig,'position',[1680-w 1050 w h]);
   case 'blueweasel'
     set(p.fig,'position',[1080 0 w h]);
-  case {'chai'}
-    set(p.fig,'position',[0 0 800 965]);
-
   otherwise
-    set_fig_size(w,h,p.fig);
-    put_fig_in_top_right;
+    set(p.fig, 'outerposition', choosefigpos(1));
 end
-
 
 % limits
 xl = [points_to_plot(1) points_to_plot(end)] + 0.5*[-1 1];

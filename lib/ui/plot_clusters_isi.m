@@ -27,8 +27,7 @@ switch get_current_computer_name
   case 'chai'
     set(p.fig,'position',[1354 30 326 939]);
   otherwise
-    set_fig_size(w,h,p.fig);
-    put_fig_in_top_right;
+    set(p.fig, 'outerposition', choosefigpos(3));
   end
 
 for cc=1:n.ctp

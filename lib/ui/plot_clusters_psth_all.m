@@ -25,8 +25,7 @@ switch get_current_computer_name
   case 'chai'
     set(p.fig,'position',[804 6 548,963]);
   otherwise
-    set_fig_size(w,h,p.fig);
-    put_fig_in_top_right;
+    set(p.fig, 'outerposition', choosefigpos(2));
   end
 
 % run through different bin widths
