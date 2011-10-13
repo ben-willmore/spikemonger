@@ -10,8 +10,6 @@ switch get_current_computer_name
     set(p.fig,'position',[2680 1050 w h]);
   case 'blueweasel'
     set(p.fig,'position',[2830 0 512 1120]);
-  case 'chai'
-    set(p.fig,'position',[1682 30 216 889]);
   otherwise
     set(p.fig, 'outerposition', choosefigpos(4));
   end
