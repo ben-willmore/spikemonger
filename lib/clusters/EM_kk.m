@@ -49,7 +49,7 @@ if ispc
 else
   suffix = '';
 end
-keyboard;
+
 executable = ['.' filesep 'lib' filesep 'klustakwik' filesep computer filesep 'KlustaKwik' suffix];
 system([executable ' .' filesep '.temp' filesep 'X_' randstr ' 1' ...
           ' -UseFeatures ' repmat('1',1,D) ...          
