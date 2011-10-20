@@ -74,7 +74,7 @@ for ii=1:L(swl)
   end
 
   % check that the sweep parameter values are consistent
-  if size(unique(reach(swp,'all.values''')','rows')',2)~=1
+  if size(unique(reach(swp,'all.values''')','rows')',2)~=1    
     error('bwvt:error','different sweep parameter values across channels');
   end
   
@@ -92,7 +92,45 @@ for ii=1:L(swl)
   
 end
 
+%% check sweep metadata consistency *across* sweeps
+% ====================================================
 
+% main metadata
+ref_fieldnames = fieldnames(all_sweep_params{1});
+all_the_same_fieldnames = all(cellfun(@(x) isequal(fieldnames(x), ref_fieldnames), all_sweep_params));
+if ~all_the_same_fieldnames
+   % get a list of all the necessary fieldnames
+   fields = {};
+   for ii=1:L(all_sweep_params)
+       fields = [fields; fieldnames(all_sweep_params{ii})];
+   end
+   fields = setdiff(unique(fields), {'all', 'timestamp', 'length_signal_ms', 'length_signal_smp'});
+   fields = sort(fields);
+   % run through each inidividual entry in all_sweep_params and add the
+   % missing fields
+   for ii=1:L(all_sweep_params)
+       for jj=1:L(fields)
+           field = fields{jj};
+           % try retrieve the field
+          try
+             all_sweep_params{ii}.(field);
+           % if it doesnt exist
+          catch
+              all_sweep_params{ii}.(field) = -1;
+          end
+       end
+      % sort field names
+      all_sweep_params{ii} = orderfields(all_sweep_params{ii});
+   end
+   
+   
+end
+
+% reconstruct main.all metadata
+for ii=1:L(all_sweep_params)
+   all_sweep_params{ii}.all.names = fields';
+   all_sweep_params{ii}.all.values = cellfun(@(x) all_sweep_params{ii}.(x), fields)';    
+end
 %% finish up
 % ============
 
@@ -102,7 +140,45 @@ for ii=find(~tokeep)
 end
   
 % aggregate
-sweep_params = cell2mat(all_sweep_params(tokeep));
+try
+  sweep_params = cell2mat(all_sweep_params(tokeep));
+
+catch
+  % which sweep params belong to which group
+  [junk, idx, gp] = unique(cellfunc(@(x) cell2mat(x.all.names), all_sweep_params)');
+  % the full list of names
+  names = {};
+  for ii=1:L(idx)
+    names = [names all_sweep_params{idx(ii)}.all.names];
+  end
+  names = unique(names);
+  % add -1s to those unavailable
+  for ii=1:L(all_sweep_params)
+    for jj=1:L(names)
+      name = names{jj};
+      try
+	all_sweep_params{ii}.(name);
+      catch
+	all_sweep_params{ii}.(name) = -1;
+      end
+    end
+  end
+  % add data to the 'all' field
+  for ii=1:L(all_sweep_params)
+    all_sweep_params{ii}.all.names = names;
+    all_sweep_params{ii}.all.values = ...
+        cellfun(@(x) all_sweep_params{ii}.(x), names);
+  end
+  % sort the fields
+  for ii=1:L(all_sweep_params)
+    all_sweep_params{ii} = orderfields(all_sweep_params{ii});
+  end
+  % now try it
+  sweep_params = cell2mat(all_sweep_params(tokeep));
+  
+end
+
+
 swl = swl(tokeep);
 
 % save it
