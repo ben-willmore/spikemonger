@@ -122,15 +122,13 @@ if ~all_the_same_fieldnames
       % sort field names
       all_sweep_params{ii} = orderfields(all_sweep_params{ii});
    end
-   
-   
+   % reconstruct the main.all metadata
+   for ii=1:L(all_sweep_params)
+     all_sweep_params{ii}.all.names = fields';
+     all_sweep_params{ii}.all.values = cellfun(@(x) all_sweep_params{ii}.(x), fields)';
+   end
 end
 
-% reconstruct main.all metadata
-for ii=1:L(all_sweep_params)
-   all_sweep_params{ii}.all.names = fields';
-   all_sweep_params{ii}.all.values = cellfun(@(x) all_sweep_params{ii}.(x), fields)';    
-end
 %% finish up
 % ============
 
