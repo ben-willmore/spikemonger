@@ -56,34 +56,3 @@ A3_analyse_clusters(dirs,'clusters_pentatrodes');
 
 end
 
-
-
-
-%% ----
-function directory = change_main_directory(directory)
-
-% query
-if nargin==0, directory = pickdir;
-else
-  try
-    directory = pickdir(directory);
-  catch
-    directory = pickdir;
-  end
-end
-
-% does the directory exist
-n.files_in_dir = L(dir(directory));
-if n.files_in_dir == 0
-  fprintf('\n*** error: no such directory. ***\n\n');
-  directory = change_main_directory(directory);
-end
-% does the directory have any src files
-n.srcfiles = L(dir([directory '*.src']));
-n.bwvtfiles = L(dir([directory '*.bwvt']));
-if n.srcfiles + n.bwvtfiles == 0
-  fprintf('\n*** error: no src files or bwvt files there. ***\n\n');
-  directory = change_main_directory(directory);
-end
-end
-
