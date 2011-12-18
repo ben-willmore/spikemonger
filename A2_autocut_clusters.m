@@ -1,6 +1,8 @@
 function A2_autocut_clusters(dirs, varargin)
   % A2_autocut_clusters(dirs)
 
+warning('off', 'MATLAB:nearlySingularMatrix');
+
 %% prelims
 % ===========
 
