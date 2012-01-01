@@ -119,10 +119,11 @@ switch todo{1}
     fprintf_subtitle('special plots');
     fprintf_bullet('[1]:  STRF for ctuning.drc data\n');    
     fprintf_bullet('[2]:  STRF for CRF04 data\n');
+    fprintf_bullet('[3]:  STRF for natural contrast data\n');
     fprintf('\n');
     fprintf_bullet(['[0]:  cancel\n']);
     fprintf('\n');
-    todo{2} = demandinput('     >>> ',['0', '1', '2']);
+    todo{2} = demandinput('     >>> ',['0', '1', '2', '3']);
     if isequal(todo{2},'0'), todo = []; return; end
     return;
     

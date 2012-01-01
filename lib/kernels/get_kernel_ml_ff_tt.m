@@ -50,7 +50,8 @@ function results = get_kernel_ml_ff_tt(grid, Y, params)
     
     
   % only requested timebins
-    Y = Y(time_bins_to_keep);
+    
+  Y = Y(time_bins_to_keep);
 %    X = X(~isnan(Y),:,:);
 %    Y = Y(~isnan(Y));
     

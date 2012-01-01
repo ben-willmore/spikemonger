@@ -2,7 +2,7 @@ function p = plot_clusters_time_changes(sweep_count,cols,clusters_to_plot)
 
 p = struct;
 p.fig = figure;
-w = 600; h = 800;
+w = 561; h = 800;
 
 % fig position
 switch get_current_computer_name

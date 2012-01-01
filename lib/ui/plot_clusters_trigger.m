@@ -13,6 +13,8 @@ n.ctp = L(clusters_to_plot);
 w = 150;
 h = min(800, 100*n.ctp);
 switch get_current_computer_name
+  case 'macgyver'
+    set(p.fig, 'position', [3225, 172, 114, 800]);
   case 'blueweasel'
     set(p.fig,'position',[3345 0 175 1120]);
   otherwise

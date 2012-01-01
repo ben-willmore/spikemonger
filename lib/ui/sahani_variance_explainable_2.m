@@ -3,6 +3,21 @@ function sve = sahani_variance_explainable_2(data,offset)
   if nargin==1
     offset = 0;
   end
+  
+  % is this natural_contrast?
+  names = data.set(1).stim_params.all.names;
+  if L(names) > 6
+    if isequal(names(1:6), {'Source', 'Sound', 'SNR', 'Token', 'Fullwidth', 'Frozen'})
+      data_original = data;
+      data = struct;
+      data.set = struct;
+      for ii=1:4
+        source_sets = data_original.set(reach(data_original.set, 'stim_params.Sound') == ii);
+        data.set(ii).repeats = [source_sets.repeats];
+        data.set(ii).length_signal_ms = source_sets(1).length_signal_ms;
+      end
+    end
+  end
 
   % parameters
   dhs = [2 5 10 25];

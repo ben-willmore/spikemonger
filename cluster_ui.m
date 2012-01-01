@@ -6,7 +6,7 @@ if ~exist('rootdir', 'var')
     % rootdir, based on source computer
     compname = get_current_computer_name;
     if strcmp(compname, 'macgyver');
-      rootdir = '/shub/experiments/data.expt34/split/';
+      rootdir = '/shub/experiments/data.expt35/ctuning/';
     elseif strcmp(compname, 'blueweasel');
       rootdir = 'data/';
     elseif strcmp(compname, 'welshcob');
@@ -70,7 +70,7 @@ for cc=1:n.c
   C.psth{cc} = get_cluster_file(dirs, cc, 'psth_all_sets');
   C.acgs{cc} = get_cluster_file(dirs, cc, 'ACGs');  
   C.isis{cc} = get_cluster_file(dirs, cc, 'ISIs');
-  C.data{cc} = get_cluster_file(dirs, cc, 'data');
+  C.data{cc} = get_cluster_file(dirs, cc, 'data');  
   try
       C.sve{cc} = get_cluster_file(dirs, cc, 'sahani_variance_explainable');
   catch
@@ -213,6 +213,8 @@ while continue_loop
           plot_STRFs_ctuning_drc(C.data);
         case '2'
           plot_STRFs_CRF04(C.data);
+        case '3'
+          plot_STRFs_natural_contrast(C.data);
       end
       
     case 'm' % merge
