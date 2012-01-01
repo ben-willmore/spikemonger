@@ -54,6 +54,15 @@ all your data, and then return when it is done to cluster cut all the data.
 -- spikemonger_batch
 -- edit the root_dir line at the start, then run spikemonger_batch
 
+If you want to merge several different recordings together, follow these steps:
+
+## for each recording directory $SOURCE_i, run spikemonger($SOURCE_i, 'pre-merge')
+## make a new root directory for merging, $MERGEDIR
+## create the directory $MERGEDIR/sweeps
+## either copy/move/symlink the sweep subdirectories from each $SOURCE_i/sweeps 
+into $MERGEDIR/sweeps
+## run spikemonger($MERGEDIR, 'post-merge')
+
 * Cluster cutting:
 
 -- cluster_ui
