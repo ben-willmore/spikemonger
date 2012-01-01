@@ -1,21 +1,20 @@
 setpath;
 
-rootdir = '../P07-quning.2';
-%rootdir = './todo2/';
+rootdir = './to.do/';
 subdirs = [getfilelist(rootdir, 'P', 'prefix')];
 
 
-% fprintf_title('subdirs:');
-% for ii=1:L(subdirs)
-%   fprintf_numbered(subdirs(ii).name, ii, L(subdirs));
-% end
+fprintf_title('subdirs:');
+for ii=1:L(subdirs)
+  fprintf_numbered(subdirs(ii).name, ii, L(subdirs));
+end
+
 
 for ii=1:L(subdirs)
 %try
   t1 = clock;
   fprintf_numbered(subdirs(ii).name,ii,L(subdirs),'title');
-  %A1_convert_f32s(subdirs(ii).fullname);
-  spikemonger(subdirs(ii).fullname);  
+  spikemonger(subdirs(ii).fullname, 'regressed', 'post-merge');  
   fprintf_subtitle(['finished ' subdirs(ii).name ' successfully:  ' timediff(t1,clock)]);
 %{
 catch ME

@@ -4,6 +4,8 @@ function A1_convert_datafiles(dirs, varargin)
 % A1_convert_f32s(..., 'force_redo')
 % A1_convert_f32s(..., 'parallel')
 % A1_convert_f32s(..., 'regressed')
+% A1_convert_f32s(..., 'pre-merge')
+% A1_convert_f32s(..., 'post-merge')
 
 %% parse varargin
 % ================
@@ -11,6 +13,8 @@ function A1_convert_datafiles(dirs, varargin)
 CAN_USE_PARALLEL = false;
 FORCE_REDO = false;
 REGRESSED = false;
+PRE_MERGE = false;
+POST_MERGE = false;
 
 try
   if nargin>1
@@ -24,7 +28,12 @@ try
     if any(ismember({'regressed'}, varargin))
       REGRESSED = true;
     end
-    
+    if any(ismember({'pre-merge'}, varargin))
+      PRE_MERGE = true;
+    end
+    if any(ismember({'post-merge'}, varargin))
+      POST_MERGE = true;
+    end
   end
 catch
 end
@@ -55,6 +64,8 @@ end
 if does_log_exist(dirs, 'A1.datafiles.converted')
   fprintf('Data files already converted.\n');
   
+elseif POST_MERGE
+  fprintf('Assuming that sweeps have been merged.\n')
   
 else
   
@@ -137,6 +148,11 @@ else
   % write to log
   create_log(dirs, 'A1.datafiles.converted');
   
+end
+
+if PRE_MERGE
+    fprintf('breaking here for merging.\n')
+    return;
 end
 
 

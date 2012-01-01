@@ -37,6 +37,7 @@ tokeep = true(1,L(swl));
 % are they all the same
 if ~(L(unique(n.sweep_param_files))==1)  
   fprintf('different number of channels per sweep. fixing by deleting sweeps:\n');
+  keyboard;
   max_n_sweeps = max(n.sweep_param_files);
   tokeep = (n.sweep_param_files == max_n_sweeps);
   disp(find(~tokeep));
