@@ -180,6 +180,10 @@ lower_limit = min(max(logP(2:end, ~(C==1))));
 % bisect and exponentiate to get W(1)
 W(1) = exp(0.5*(lower_limit + upper_limit));
 
+% fix: make sure this is a reasonable number
+if ~isfinite(W(1))
+  W(1) = 1e-15;
+end
 
 %% prepare output
 % =================
