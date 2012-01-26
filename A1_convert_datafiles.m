@@ -192,12 +192,18 @@ if REGRESSED
     
   else
     
+    % get the number of channels
+    n_channels = unique(arrayfun( @(x) L(x.by_type.filtered_signal), swl ));
+    if L(n_channels) > 1
+      error('different number of channels in different sweeps');
+    end
+    
     for ss = 1:L(swl)
       fprintf(['sweep %d' filesep '%d\n'], ss, L(swl));
-      signals = cell(1, 16);
+      signals = cell(1, n_channels);
       
       % load signals
-      for ii=1:16
+      for ii=1:n_channels
         filename = swl(ss).by_type.filtered_signal(ii).fullname;
         tmp = load(filename);
         try
@@ -216,10 +222,10 @@ if REGRESSED
       regressed_signals = zeros(size(signals));
       
       % regress outside the pentatrode, using random subset
-      for ii=1:16
+      for ii=1:n_channels
         tok = randsample(n.samples, n.reg_samples);
         y = signals(tok, ii);
-        jj = setdiff(1:16, ii+(-2:2));
+        jj = setdiff(1:n_channels, ii+(-2:2));
         x = [signals(tok, jj), ones(n.reg_samples,1)];
         b = regress(y,x);
         % correct the f32
@@ -227,7 +233,7 @@ if REGRESSED
       end
       
       % save signals
-      for ii=1:16
+      for ii=1:n_channels
         filename = swl(ss).by_type.filtered_signal(ii).fullname;
         sig = regressed_signals(:, ii);
         save(filename, 'sig', '-v6');
