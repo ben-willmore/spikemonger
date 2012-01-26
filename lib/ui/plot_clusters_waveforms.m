@@ -62,7 +62,10 @@ for cc=1:n.ctp
     
     % set limits
     xlim(xl);
-    ylim(yl/2);
+    try
+      ylim(yl/2);
+    catch
+    end
     
     % title
     if ii==1
