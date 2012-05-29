@@ -14,7 +14,8 @@ for ii=1:L(subdirs)
 %try
   t1 = clock;
   fprintf_numbered(subdirs(ii).name,ii,L(subdirs),'title');
-  spikemonger(subdirs(ii).fullname, 'regressed', 'post-merge');  
+  spikemonger(subdirs(ii).fullname);  
+  %spikemonger(subdirs(ii).fullname, 'regressed', 'post-merge');  
   fprintf_subtitle(['finished ' subdirs(ii).name ' successfully:  ' timediff(t1,clock)]);
 %{
 catch ME
