@@ -43,7 +43,9 @@ sweep_params.all.values = sweep.stimInfo.stimParameters;
 
 fields = sweep_params.all.names;
 for ff=1:L(fields)
-  sweep_params.(fields{ff}) = sweep_params.all.values(ff);
+  fieldname = fields{ff};
+  fieldname(fieldname==' ') = '_';
+  sweep_params.(fieldname) = sweep_params.all.values(ff);
 end
 sweep_params.length_signal_smp = L(signal);
 sweep_params.length_signal_ms  = L(signal) * dt;
