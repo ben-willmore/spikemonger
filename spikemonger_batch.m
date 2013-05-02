@@ -1,6 +1,6 @@
 setpath;
 
-rootdir = './to.do/';
+rootdir = '/lab/wocka/auditory-objects/expt45/';
 subdirs = [getfilelist(rootdir, 'P', 'prefix')];
 
 

@@ -86,7 +86,7 @@ else
   end
 
   % directory contents  
-  files = getfilelist(source_dir, source_ext);
+  files = [getfilelist(source_dir, source_ext); getfilelist(source_dir, [source_ext '.gz'])];
   files = files(~ismember({files.prefix}, {'nothing'}));
   n.files = L(files);
   mkdir_nowarning(dirs.sweeps);
@@ -99,9 +99,11 @@ else
     files(ii).sweep_idx = sweep_idx;
 
     channel_idx = regexprep(files(ii).name, '^.*channel.', '');
-    channel_idx = regexprep(channel_idx, source_ext, '');
+channel_idx = regexprep(channel_idx, '\..*', '');
+    % channel_idx = regexprep(channel_idx, source_ext, '');
     channel_idx = str2double(channel_idx);
     files(ii).channel_idx = channel_idx;
+
   end
 
   % load metadata (only for f32s)
