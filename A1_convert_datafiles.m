@@ -81,8 +81,9 @@ else
     source_ext = 'f32';
     
   else
-    error(sprintf('Could not find data directory (%s or %s)', ...
-      dirs.raw_bwvt, dirs.raw_f32));
+    fprintf('Could not find data directory (%s or %s)', ...
+	    dirs.raw_bwvt, dirs.raw_f32);
+    return;
   end
 
   % directory contents  
@@ -108,9 +109,15 @@ channel_idx = regexprep(channel_idx, '\..*', '');
 
   % load metadata (only for f32s)
   if strcmp(source_ext, 'f32')
-    load([dirs.root 'gridInfo.mat']);
+    % THIS SHOULD NOT USE SWEEP FILES
+    try
+      load([dirs.root 'gridInfo.mat']);
+    catch
+      load([dirs.root 'gridInfo.orig.donotalter.mat']);
+    end
 
     sweep_files = getmatfilelist([dirs.root 'sweep.mat' filesep]);
+
     for ii=1:L(sweep_files)
       sweep_idx = regexprep(sweep_files(ii).name, '^.*sweep.', '');
       sweep_idx = regexprep(sweep_idx, '.mat', '');
@@ -126,7 +133,7 @@ channel_idx = regexprep(channel_idx, '\..*', '');
       sweeps{ii} = swt.sweep;
     end
     sweeps = cell2mat(sweeps);
-  
+
   end
   
   fprintf('converting data files:\n\n');

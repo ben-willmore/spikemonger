@@ -12,6 +12,12 @@ dirs = fix_dirs_struct(dirs);
 % title
 fprintf_subtitle('(2) clustering');
 
+% terminate if A1 not already done
+if ~does_log_exist(dirs, 'A1.finished')
+  fprintf_bullet('A1 not done. Skipping A2.\n');
+  return;
+end
+
 % terminate if all clustering has already been done
 if does_log_exist(dirs, 'A2.clustered.training.full') ...
     & does_log_exist(dirs, 'A2.clustered.training.full_no_time') ...
@@ -110,7 +116,7 @@ else
   % add random noise to fsp
   for ii=1:(size(fsp, 2)-1)
     num_of_zeros = sum(fsp(:, ii)==0);
-    fsp(fsp(:, ii)==0, ii) = randn(num_of_zeros, 1) * std(fsp(~(fsp(:, ii)==0), ii));
+    fsp(fsp(:, ii)==0, ii) = randn(num_of_zeros, 1) * std(fsp(~(fsp(:, ii)==0), ii))*(49^2)/(size(fsp,2)^2);
   end
   
   % cluster
