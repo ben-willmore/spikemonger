@@ -116,7 +116,7 @@ else
   % add random noise to fsp
   for ii=1:(size(fsp, 2)-1)
     num_of_zeros = sum(fsp(:, ii)==0);
-    fsp(fsp(:, ii)==0, ii) = randn(num_of_zeros, 1) * std(fsp(~(fsp(:, ii)==0), ii))*(49^2)/(size(fsp,2)^2);
+    fsp(fsp(:, ii)==0, ii) = randn(num_of_zeros, 1) * std(fsp(~(fsp(:, ii)==0), ii));
   end
   
   % cluster
