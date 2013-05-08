@@ -111,13 +111,29 @@ if does_log_exist(dirs, 'A2.clustered.training.pentatrodes')
   
 else    
   % retrieve feature space
+  CEs = get_event_file(dirs, 'candidate_events_pentatrodes');
   fsp = get_event_file(dirs, 'feature_space_pentatrodes');
+  cd = get_event_file(dirs, 'feature_space_conditional_distributions');
+
+  % add random noise to fsp, with mean and variance equal to
+  % distributions measured earlier, conditioned on which channel
+  % triggered the event
+  for trigger_channel = unique(CEs.trigger)'
+    trigger_idx = CEs.trigger==trigger_channel;
+    n = sum(trigger_idx);
+    dim_idxes = find(all(fsp(trigger_idx, :)==0));
+    
+    for dim_idx = dim_idxes
+      fsp(trigger_idx,dim_idx) = cd.mean(dim_idx, trigger_channel) + ...
+                                  cd.sd(dim_idx, trigger_channel)*randn(n, 1);
+    end
+  end
 
   % add random noise to fsp
-  for ii=1:(size(fsp, 2)-1)
-    num_of_zeros = sum(fsp(:, ii)==0);
-    fsp(fsp(:, ii)==0, ii) = randn(num_of_zeros, 1) * std(fsp(~(fsp(:, ii)==0), ii));
-  end
+  %for ii=1:(size(fsp, 2)-1)
+  %  num_of_zeros = sum(fsp(:, ii)==0);
+  %  fsp(fsp(:, ii)==0, ii) = randn(num_of_zeros, 1) * std(fsp(~(fsp(:, ii)==0), ii));
+  %end
   
   % cluster
   t1 = clock;
