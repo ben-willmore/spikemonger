@@ -178,7 +178,12 @@ upper_limit = maxall(logP(2:end, C==1));
 lower_limit = min(max(logP(2:end, ~(C==1))));
 
 % bisect and exponentiate to get W(1)
-W(1) = exp(0.5*(lower_limit + upper_limit));
+try
+  W(1) = exp(0.5*(lower_limit + upper_limit));
+catch
+  % (BW) fix: make sure this is a reasonable number
+  W(1) = 1e-15;
+end
 
 % fix: make sure this is a reasonable number
 if ~isfinite(W(1))
