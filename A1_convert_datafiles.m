@@ -81,12 +81,13 @@ else
     source_ext = 'f32';
     
   else
-    error(sprintf('Could not find data directory (%s or %s)', ...
-      dirs.raw_bwvt, dirs.raw_f32));
+    fprintf('Could not find data directory (%s or %s)', ...
+	    dirs.raw_bwvt, dirs.raw_f32);
+    return;
   end
 
   % directory contents  
-  files = getfilelist(source_dir, source_ext);
+  files = [getfilelist(source_dir, source_ext); getfilelist(source_dir, [source_ext '.gz'])];
   files = files(~ismember({files.prefix}, {'nothing'}));
   n.files = L(files);
   mkdir_nowarning(dirs.sweeps);
@@ -99,16 +100,24 @@ else
     files(ii).sweep_idx = sweep_idx;
 
     channel_idx = regexprep(files(ii).name, '^.*channel.', '');
-    channel_idx = regexprep(channel_idx, source_ext, '');
+channel_idx = regexprep(channel_idx, '\..*', '');
+    % channel_idx = regexprep(channel_idx, source_ext, '');
     channel_idx = str2double(channel_idx);
     files(ii).channel_idx = channel_idx;
+
   end
 
   % load metadata (only for f32s)
   if strcmp(source_ext, 'f32')
-    load([dirs.root 'gridInfo.mat']);
+    % THIS SHOULD NOT USE SWEEP FILES
+    try
+      load([dirs.root 'gridInfo.mat']);
+    catch
+      load([dirs.root 'gridInfo.orig.donotalter.mat']);
+    end
 
     sweep_files = getmatfilelist([dirs.root 'sweep.mat' filesep]);
+
     for ii=1:L(sweep_files)
       sweep_idx = regexprep(sweep_files(ii).name, '^.*sweep.', '');
       sweep_idx = regexprep(sweep_idx, '.mat', '');
@@ -124,7 +133,7 @@ else
       sweeps{ii} = swt.sweep;
     end
     sweeps = cell2mat(sweeps);
-  
+
   end
   
   fprintf('converting data files:\n\n');
@@ -320,9 +329,10 @@ if ~does_log_exist(dirs, 'A1.candidate.events.pentatrodes.compiled')
   
   % design feature space
   if ~does_log_exist(dirs, 'A1.fsp.generated')
-    [fsp params] = design_feature_space(CEs, params);
+    [fsp params conditional_distributions] = design_feature_space(CEs, params);
     save_event_file(dirs, fsp, 'feature_space_pentatrodes');
     save_event_file(dirs, params, 'feature_space_params');
+    save_event_file(dirs, conditional_distributions, 'feature_space_conditional_distributions');
     create_log(dirs, 'A1.fsp.generated');
   else
     params = get_event_file(dirs, 'feature_space_params');

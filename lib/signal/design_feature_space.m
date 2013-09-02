@@ -1,4 +1,4 @@
-function [fsp p] = design_feature_space(CEs, params)
+function [fsp p conditional_distributions] = design_feature_space(CEs, params)
   % [fsp params] = design_feature_space(CEs, params)
   
 %% PCA parameters
@@ -48,6 +48,10 @@ n.ch = s(3);
 
 % zero out shapes outside the pentatrode
 if p.use_pentatrodes
+  % save original data so we can use it to calculate
+  % conditional distributions later on
+  orig_shape = CEs.shape;
+
   for cc=1:n.ch    
     % which events are triggered on that channel
     which_events = (CEs.trigger == cc);
@@ -96,6 +100,13 @@ for ii=1:n.events
   sht(ii,:,:) = CEs.shape( ii, ti(ii):tf(ii), :, :);
 end
 
+% apply same timeshift and trim unzeroed data
+if p.use_pentatrodes
+  orig_sht = nan(n.events, L(p.pca_samples + p.max_alignment_shift), n.ch, 'single');
+  for ii=1:n.events
+    orig_sht(ii,:,:) = orig_shape( ii, ti(ii):tf(ii), :, :);
+  end
+end
 
 %% perform PCA
 % ==============
@@ -111,6 +122,11 @@ v = cell(1,n.ch);
 
 % fsp = events in PC space
 fsp = nan(n.events,n.total);
+
+if p.use_pentatrodes
+  fsp_orig = fsp;
+end
+
 for ii=1:n.ch
   jj = (ii-1)*n.pc + (1:n.pc);
   % just data in this channel
@@ -130,6 +146,16 @@ for ii=1:n.ch
   v{ii} = vt(:,1:n.pc);
   % project into feature space
   fsp(:,jj) = shtt * v{ii};
+
+  % project non-zeroed data into feature space
+  if p.use_pentatrodes
+    orig_shtt = sq(orig_sht(:,:,ii));
+    fsp_orig(:,jj) = orig_shtt * v{ii};
+  end
+end
+
+if ~p.use_pentatrodes
+  fsp_orig = fsp;
 end
 
 % save eigenvectors
@@ -140,10 +166,12 @@ p.v = v;
 
 if p.include_trigger
   fsp = [fsp CEs.trigger];
+  fsp_orig(:, end+1) = nan;
 end
 
 if p.include_absolute_time
   fsp = [fsp CEs.time_absolute_s];
+  fsp_orig(:, end+1) = nan;
 end
 
 %% find unique events, if not pentatrodes
@@ -173,6 +201,7 @@ if ~p.use_pentatrodes
 
   % output
   fsp = fsp(tokeep,:);
+  fsp_orig = fsp_orig(tokeep,:);
   which_kept = tokeep_all;
 
 end
@@ -215,6 +244,24 @@ if p.use_pentatrodes
   
   % output
   fsp = fsp(tokeep,:);
+  fsp_orig = fsp_orig(tokeep,:);
   p.which_kept = find(tokeep);
   
+end
+
+%% calculate distributions of voltages, conditioned
+%% on trigger channel
+% ===================================================
+
+conditional_distributions.mean = nan(size(fsp, 2), n.ch);
+conditional_distributions.sd = nan(size(fsp, 2), n.ch);
+trigger = CEs.trigger(p.which_kept);
+assert(length(trigger)==size(fsp,1));
+assert(all(size(fsp)==size(fsp_orig)));
+
+for trigger_channel = 1:n.ch
+  which_events = trigger==trigger_channel;
+  ev = fsp_orig(which_events,:);
+  conditional_distributions.mean(:, trigger_channel) = mean(ev);
+  conditional_distributions.sd(:, trigger_channel) = std(ev);
 end

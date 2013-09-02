@@ -26,6 +26,12 @@ dirs = fix_dirs_struct(dirs);
 t1 = clock;
 fprintf_subtitle(['(3) calculating clustering statistics  (' cluster_type ')']);
 
+% terminate if A2 not already done
+if ~does_log_exist(dirs, 'A1.finished')
+  fprintf_bullet('A2 not done. Skipping A3.\n');
+  return;
+end
+
 % skip if already done
 if does_log_exist(dirs,['A3.' cluster_type '.statistics.calculated']);
   fprintf_bullet('already done.\n');
@@ -366,9 +372,9 @@ for cc=1:n.c
   % -----------------------------
   
   % do not run if the individual sets are of different lengths
-  if L(unique([data.set.length_signal_ms]))>1
-    continue;
-  end
+  %if L(unique([data.set.length_signal_ms]))>1
+  %  continue;
+  %end
   
   % calculate and save
   sve = sahani_variance_explainable_2(data);  

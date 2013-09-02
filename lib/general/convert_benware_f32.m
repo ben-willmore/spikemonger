@@ -14,9 +14,10 @@ if ~exist(file.fullname,'file')
 end
 
 % import
-fid = fopen(file.fullname);
-signal = fread(fid, inf, 'float32');
-fclose(fid);
+%fid = fopen(file.fullname);
+%signal = fread(fid, inf, 'float32');
+%fclose(fid);
+signal = f32read(file.fullname);
 
 % check that it is the right length
 correct_length = sweep.sweepLen.samples;
